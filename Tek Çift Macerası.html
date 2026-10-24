@@ -1,0 +1,846 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Tek Çift Macerası</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Düzen: tek sütun, kalın çerçeveli oyun kartları; tek=mavi, çift=turuncu her yerde aynı */
+:root{
+  --bg:#fff5e1;--bg2:#e4f3ff;--card:#ffffff;--ink:#27214d;--muted:#645f8f;--line:#e5def6;
+  --tek:#2f6fe8;--tek-s:#dbe7ff;--on-tek:#ffffff;
+  --cift:#ff8a1f;--cift-s:#ffe6cc;--on-cift:#3a1d00;
+  --good:#12935a;--good-s:#d7f5e6;--bad:#d93560;--bad-s:#ffe0e8;
+  --pur:#7048f0;--pur-s:#e9e1ff;--pink:#ff5fa2;--yel:#ffcf33;--on-yel:#3a1d00;
+  --sh:0 5px 0 rgba(39,33,77,.14);--wc:#7048f0;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1d1943;--bg2:#12113a;--card:#2b2659;--ink:#f5f1ff;--muted:#bab2e8;--line:#433c7d;
+  --tek:#6ea4ff;--tek-s:#243a75;--on-tek:#0c1a3d;
+  --cift:#ffa24a;--cift-s:#5b3a1b;
+  --good:#3ddc97;--good-s:#17432f;--bad:#ff7d9a;--bad-s:#51202f;
+  --pur:#9a7bff;--pur-s:#3b3278;--sh:0 5px 0 rgba(0,0,0,.35);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1d1943;--bg2:#12113a;--card:#2b2659;--ink:#f5f1ff;--muted:#bab2e8;--line:#433c7d;
+  --tek:#6ea4ff;--tek-s:#243a75;--on-tek:#0c1a3d;
+  --cift:#ffa24a;--cift-s:#5b3a1b;
+  --good:#3ddc97;--good-s:#17432f;--bad:#ff7d9a;--bad-s:#51202f;
+  --pur:#9a7bff;--pur-s:#3b3278;--sh:0 5px 0 rgba(0,0,0,.35);color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;font-family:'Baloo 2',system-ui,'Segoe UI',Roboto,sans-serif;font-weight:600;font-size:18px;line-height:1.35;
+  color:var(--ink);background:var(--bg);background:linear-gradient(180deg,var(--bg2),var(--bg)) fixed;min-height:100vh;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(circle at 6% 14%,rgba(255,95,162,.18) 0 90px,transparent 91px),
+  radial-gradient(circle at 94% 22%,rgba(255,207,51,.22) 0 70px,transparent 71px),
+  radial-gradient(circle at 88% 90%,rgba(47,111,232,.16) 0 120px,transparent 121px),
+  radial-gradient(circle at 8% 88%,rgba(18,147,90,.16) 0 80px,transparent 81px)}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:4px solid var(--yel);outline-offset:2px}
+#app{position:relative;z-index:1;max-width:820px;margin:0 auto;padding-block:12px 56px}
+h1,h2,h3,p{margin:0}
+.big{font-size:2.2rem;font-weight:800}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grow{flex:1}
+.center{text-align:center}
+
+/* üst çubuk */
+.hud{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.pill{background:var(--card);border:3px solid var(--line);border-radius:999px;padding:2px 12px;font-weight:800;white-space:nowrap}
+.icon{width:46px;height:46px;border-radius:50%;border:3px solid var(--line);background:var(--card);font-size:1.25rem;box-shadow:0 3px 0 var(--line);display:grid;place-items:center;padding:0}
+.icon:active{transform:translateY(2px);box-shadow:none}
+
+/* düğmeler */
+.btn{border:0;border-radius:18px;padding:10px 22px;min-height:48px;font-weight:800;font-size:1.1rem;background:var(--pur);color:#fff;box-shadow:0 5px 0 rgba(0,0,0,.22);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.22)}
+.btn.alt{background:var(--cift);color:var(--on-cift)}
+.btn.good{background:var(--good);color:#fff}
+.dark-on .btn.good{color:#06210f}
+.btn.ghost{background:var(--card);color:var(--ink);border:3px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn.sm{min-height:42px;padding:4px 16px;font-size:1.2rem;border-radius:14px}
+.btn.xl{font-size:1.5rem;padding:14px 34px;border-radius:24px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+.card{background:var(--card);border:3px solid var(--line);border-radius:26px;padding:16px;box-shadow:var(--sh)}
+.tag{display:inline-block;border-radius:999px;padding:0 12px;font-weight:800;font-size:.95rem}
+.tag.od,.od-bg{background:var(--tek);color:var(--on-tek)}
+.tag.ev,.ev-bg{background:var(--cift);color:var(--on-cift)}
+.cap{color:var(--muted);font-size:.95rem;margin:8px 0 4px}
+
+/* ana ekran */
+.home{text-align:center;padding-top:18px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.logo{font-size:clamp(2.6rem,11vw,4.6rem);font-weight:800;line-height:.95;letter-spacing:-.01em}
+.logo .t{color:var(--tek)}.logo .c{color:var(--cift)}
+.logo small{display:block;font-size:.42em;color:var(--pink);letter-spacing:.04em;margin-top:6px}
+.homepills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:560px}
+.homepills .tag{background:var(--card);border:3px solid var(--line)}
+.mascot{display:block;overflow:visible}
+.bob{animation:bob 2.2s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes bob{0%,100%{transform:translateY(0) scaleY(1)}50%{transform:translateY(-6px) scaleY(1.03)}}
+@keyframes wob{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.12)}100%{transform:scale(1);opacity:1}}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+.shake{animation:shake .35s}
+
+/* harita */
+.map h2{font-size:1.7rem}
+.skills{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.sk{font-size:.95rem}
+.sk b{display:flex;justify-content:space-between;gap:6px}
+.meter{height:12px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:3px}
+.meter i{display:block;height:100%;background:var(--wc);border-radius:99px;transition:width .6s}
+.worlds{display:flex;flex-direction:column;gap:14px;margin-top:16px}
+.world{display:grid;grid-template-columns:64px 1fr;gap:6px 14px;align-items:center;position:relative}
+.world.locked{opacity:.6}
+.wico{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;font-size:2rem;background:var(--wc);box-shadow:0 4px 0 rgba(0,0,0,.2)}
+.world h3{font-size:1.25rem;line-height:1.1}
+.world .sub{color:var(--muted);font-size:.95rem}
+.world .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.world .chips{justify-content:flex-start}
+.world .go .btn{padding:6px 16px;min-height:44px;font-size:1rem}
+.world .chips span{background:var(--pur-s);border-radius:99px;padding:0 10px;font-size:.82rem;font-weight:700}
+.world .go{grid-column:1/-1;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stars{font-size:1.3rem;letter-spacing:1px;white-space:nowrap}
+.stars .off{filter:grayscale(1);opacity:.35}
+.foot{margin-top:22px;text-align:center;color:var(--muted);font-size:.9rem}
+.foot button{background:none;border:0;text-decoration:underline;color:var(--muted)}
+
+/* ders */
+.lesson .say{display:flex;gap:12px;align-items:flex-start}
+.bubble{position:relative;background:var(--card);border:3px solid var(--line);border-radius:22px;padding:12px 16px;flex:1;min-width:0;font-size:1.1rem}
+.bubble::before{content:"";position:absolute;left:-12px;top:22px;border:10px solid transparent;border-right-color:var(--line);border-left:0}
+.demo{margin-top:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.stepper{display:flex;align-items:center;gap:14px}
+.verdict{min-height:34px;text-align:center}
+.dots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;font-size:1.7rem;line-height:1.2}
+.pair{background:var(--good-s);border:3px solid var(--good);border-radius:999px;padding:2px 10px}
+.pair.lone{background:var(--bad-s);border-color:var(--bad);animation:wob 1s infinite}
+.dot{padding:0 2px}
+.digits{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.dg{width:40px;height:44px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:1.3rem}
+.dg.ev,.dsp.ev{background:var(--cift-s);border:3px solid var(--cift)}
+.dg.od,.dsp.od{background:var(--tek-s);border:3px solid var(--tek)}
+.dg.hl{transform:scale(1.25);box-shadow:0 0 0 4px var(--yel)}
+.dleg{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px;font-size:.95rem}
+.dleg span{border-radius:99px;padding:0 12px;font-weight:800}
+.dleg .ev{background:var(--cift);color:var(--on-cift)}.dleg .od{background:var(--tek);color:var(--on-tek)}
+.numin{width:150px;font:inherit;font-weight:800;font-size:1.8rem;text-align:center;border:3px solid var(--line);border-radius:16px;padding:4px 8px;background:var(--card);color:var(--ink)}
+.dspl{display:flex;gap:4px;justify-content:center}
+.dsp{min-width:44px;height:56px;padding:0 6px;border-radius:12px;display:grid;place-items:center;font-weight:800;font-size:1.9rem;background:var(--card);border:3px solid var(--line)}
+.dsp.last{border-color:var(--yel);background:var(--yel);color:var(--on-yel);transform:scale(1.1)}
+.tbl{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;width:100%}
+.tbl .cell{aspect-ratio:1;border-radius:10px;display:grid;place-items:center;font-weight:800;background:var(--card);border:2px solid var(--line);font-size:.95rem}
+.tbl[data-m="ev"] .cell.ev{background:var(--cift);color:var(--on-cift);border-color:var(--cift)}
+.tbl[data-m="od"] .cell.od{background:var(--tek);color:var(--on-tek);border-color:var(--tek)}
+.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.dots-nav{display:flex;gap:6px;justify-content:center;align-items:center}
+.dots-nav i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.dots-nav i.on{background:var(--wc)}
+
+/* sorular */
+.qtop{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.prog{flex:1;height:18px;border-radius:99px;background:var(--line);overflow:hidden;border:3px solid var(--line)}
+.prog i{display:block;height:100%;background:var(--wc);border-radius:99px;transition:width .4s}
+.strk{min-width:56px;font-weight:800;color:var(--cift)}
+.qcard .skill{display:flex;justify-content:space-between;gap:8px;font-size:.88rem;color:var(--muted);margin-bottom:6px;flex-wrap:wrap}
+.qcard .skill b{background:var(--wc);color:#fff;border-radius:99px;padding:0 12px}
+.prompt{font-size:1.3rem;font-weight:800;line-height:1.3}
+.prompt .big{display:inline-block;margin:0 4px}
+.visual{margin:14px 0 6px;display:flex;flex-direction:column;gap:10px;align-items:center}
+.ans{margin-top:14px}
+.opts{display:grid;grid-template-columns:1fr;gap:10px}
+.opts.two{grid-template-columns:1fr 1fr}
+.opts.grid{grid-template-columns:repeat(2,1fr)}
+@media (min-width:560px){.opts.grid{grid-template-columns:repeat(4,1fr)}}
+.opt{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:10px 12px;font-size:1.15rem;font-weight:800;min-height:58px;box-shadow:0 4px 0 var(--line);text-align:center;transition:transform .08s}
+.opt:active{transform:translateY(3px);box-shadow:none}
+.opt.o-tek{background:var(--tek);color:var(--on-tek);border-color:var(--tek);box-shadow:0 4px 0 rgba(0,0,0,.2);font-size:1.4rem}
+.opt.o-cift{background:var(--cift);color:var(--on-cift);border-color:var(--cift);box-shadow:0 4px 0 rgba(0,0,0,.2);font-size:1.4rem}
+.opt.emo{font-size:2rem}
+.opt.right{background:var(--good);border-color:var(--good);color:#fff;animation:pop .35s}
+.opt.wrong{opacity:.45;border-color:var(--bad);text-decoration:line-through}
+.inwrap{display:flex;justify-content:center}
+.inwrap input{width:180px;font:inherit;font-weight:800;font-size:2rem;text-align:center;border:4px solid var(--line);border-radius:18px;padding:4px 8px;background:var(--card);color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+.chip{min-width:78px;min-height:68px;padding:4px 10px;border-radius:18px;border:3px dashed var(--line);background:var(--card);font-weight:800;font-size:1.5rem;line-height:1.05;transition:transform .1s}
+.chip small{display:block;font-size:.7rem;min-height:1em;letter-spacing:.05em}
+.chip:active{transform:scale(.94)}
+.chip.s-tek{background:var(--tek);color:var(--on-tek);border:3px solid var(--tek)}
+.chip.s-cift{background:var(--cift);color:var(--on-cift);border:3px solid var(--cift)}
+.chip.sel{background:var(--pur);color:#fff;border:3px solid var(--pur);transform:translateY(-3px)}
+.chip.bad{outline:4px solid var(--bad)}
+.chip.rev{outline:4px solid var(--good)}
+.chip.fruit{font-size:1.1rem;min-width:96px}
+.houses{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.house{border:3px solid var(--line);background:var(--card);border-radius:14px;padding:2px 10px;font-size:1.05rem;font-weight:800;display:flex;gap:4px;align-items:center}
+.house b{font-size:1.2rem}
+.house.mk{opacity:.4;text-decoration:line-through}
+.house.ev{border-color:var(--cift);background:var(--cift-s)}
+.house.od{border-color:var(--tek);background:var(--tek-s)}
+.seq{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;align-items:center}
+.box{min-width:48px;height:50px;padding:0 8px;display:grid;place-items:center;border-radius:14px;background:var(--card);border:3px solid var(--line);font-size:1.45rem;font-weight:800}
+.box.q{border-style:dashed;background:var(--yel);border-color:var(--yel);color:var(--on-yel)}
+.box.ev{background:var(--cift-s);border-color:var(--cift)}
+.box.od{background:var(--tek-s);border-color:var(--tek)}
+.jump{font-size:.82rem;color:var(--muted);font-weight:800}
+.fig{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%}
+.fig>div{background:var(--card);border:3px solid var(--line);border-radius:16px;padding:6px 8px;min-width:90px;text-align:center}
+.fig .sq{display:inline-block;width:20px;height:20px;border-radius:5px;background:var(--pink);margin:2px}
+.fig .sq.b{background:var(--yel)}
+.fig .sq.c{background:var(--good)}
+.fig small{display:block;color:var(--muted)}
+table.t{border-collapse:collapse;font-size:1rem}
+table.t th,table.t td{border:2px solid var(--line);padding:2px 12px;text-align:center}
+table.t th{background:var(--pur-s)}
+.clues{margin:0;padding-left:1.3em;text-align:left;font-size:1.1rem}
+.clues li{margin:3px 0}
+.baskets{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.baskets>div{border-radius:18px;padding:8px;text-align:center;font-size:1.2rem;font-weight:800}
+.baskets .ev{background:var(--cift-s);border:3px solid var(--cift)}
+.baskets .od{background:var(--tek-s);border:3px solid var(--tek)}
+.baskets h4{margin:0 0 4px;font-size:1rem}
+
+/* tahta / robot */
+.board{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;width:100%;max-width:560px}
+.board .cell{aspect-ratio:1;display:grid;place-items:center;border-radius:10px;font-size:.85rem;font-weight:800;position:relative;border:2px solid transparent}
+.board .cell.ev{background:var(--cift-s)}.board .cell.od{background:var(--tek-s)}
+.board .cell.seen{border-color:var(--pur)}
+.board .cell.here{background:var(--yel);color:var(--on-yel);transform:scale(1.14);z-index:1}
+.board .cell.here::after{content:'🤖';position:absolute;top:-12px;font-size:1.3rem}
+.board .flag{position:absolute;top:-4px;right:-1px;font-size:.75rem;font-style:normal}
+.prog-code{background:var(--card);border:3px solid var(--line);border-radius:18px;padding:8px 12px;min-width:min(100%,260px)}
+.blk{padding:5px 12px;border-radius:12px;font-weight:800;color:#fff;margin:4px 0;font-size:1rem}
+.blk.add{background:#6a3fe6}.blk.rep{background:#0e8a54}.blk.if{background:#c2410c}
+.blk.st{background:#475569}
+.inner{margin-left:12px;padding-left:10px;border-left:5px solid var(--line)}
+.pal{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.pal .btn{background:#6a3fe6;color:#fff}
+.rows{display:flex;flex-direction:column;gap:8px;width:100%;max-width:520px}
+.brow{display:flex;gap:8px;align-items:center;background:var(--card);border:3px solid var(--line);border-radius:16px;padding:6px 10px;flex-wrap:wrap}
+.brow .blk{margin:0;flex:1;min-width:130px}
+.brow .n{font-weight:800;min-width:2ch;text-align:center}
+.empty{color:var(--muted);text-align:center;padding:10px}
+.cb{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%}
+.steps{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+.stp{display:flex;gap:8px;align-items:center;border-radius:18px;padding:6px 10px}
+.stp.od{background:var(--tek-s);border:3px solid var(--tek)}.stp.ev{background:var(--cift-s);border:3px solid var(--cift)}
+.stp b{min-width:2ch;text-align:center;font-size:1.4rem}
+
+/* grafik */
+.chart{width:100%;max-width:460px}
+.plot{position:relative;margin-left:30px}
+.gl{position:absolute;left:0;right:0;height:0;border-top:1px solid var(--line)}
+.gl.mi{border-top-style:dotted;opacity:.7}
+.gl span{position:absolute;left:-28px;top:-.8em;font-size:.8rem;color:var(--muted);font-weight:700;width:22px;text-align:right}
+.cols{position:absolute;inset:0;display:flex}
+.col{flex:1;display:flex;align-items:flex-end;justify-content:center}
+.bar{width:58%;max-width:64px;border-radius:10px 10px 0 0;background:var(--pur);position:relative;transition:height .3s;min-height:0}
+.bar.od{background:var(--tek)}.bar.ev{background:var(--cift)}
+.bar b{position:absolute;top:-24px;left:0;right:0;text-align:center;font-size:1rem}
+.labs{display:flex;margin-left:30px;border-top:3px solid var(--ink)}
+.cl{flex:1;text-align:center;font-size:1.25rem;font-weight:800;padding-top:2px;line-height:1.1}
+.cl small{display:block;font-size:.72rem;color:var(--muted)}
+
+/* geribildirim */
+.fb{margin-top:14px}
+.fbin{display:flex;gap:12px;align-items:flex-start;border-radius:22px;padding:12px;border:3px solid;animation:pop .3s}
+.fbin>div{min-width:0;flex:1}
+.fbin.good{background:var(--good-s);border-color:var(--good)}
+.fbin.hint{background:var(--cift-s);border-color:var(--cift)}
+.fbin.bad{background:var(--bad-s);border-color:var(--bad)}
+.fbin b.t{font-size:1.2rem;display:block}
+.fbin .vis{margin-top:8px}
+.actions{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 18px;border-radius:99px;font-weight:800;z-index:60;animation:pop .25s;max-width:90vw;text-align:center}
+
+/* sonuç */
+.result{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center;padding-top:10px}
+.bigstars{font-size:3.4rem;letter-spacing:6px}
+.bigstars span{display:inline-block;animation:pop .5s backwards}
+.bigstars .off{filter:grayscale(1);opacity:.3}
+.stat{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.stat .pill{font-size:1.05rem}
+.conf{position:fixed;top:-24px;width:10px;height:14px;z-index:70;animation:fall 2.8s linear forwards;border-radius:2px;pointer-events:none}
+.dice{font-size:3rem}
+@media (max-width:420px){body{font-size:17px}.prompt{font-size:1.2rem}.opts.two{grid-template-columns:1fr}.world{grid-template-columns:54px 1fr}.wico{width:54px;height:54px;font-size:1.7rem}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app"></div>
+
+<script>
+(function(){
+'use strict';
+/* ================= yardımcılar ================= */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[rnd(0,a.length-1)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+const sample=(a,n)=>shuffle(a).slice(0,n);
+const even=n=>n%2===0;
+const pw=n=>even(n)?'çift':'tek';
+const cap1=s=>s.charAt(0).toLocaleUpperCase('tr')+s.slice(1);
+const uniqN=(n,lo,hi)=>{const s=new Set();while(s.size<n)s.add(rnd(lo,hi));return [...s]};
+const sum=a=>a.reduce((x,y)=>x+y,0);
+
+/* ================= kayıt ================= */
+const KEY='tekcift-macera-v1';
+let SAVE={xp:0,worlds:{},stats:{},music:true,sfx:true,seen:{}};
+try{const s=localStorage.getItem(KEY);if(s)SAVE=Object.assign(SAVE,JSON.parse(s))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(SAVE))}catch(e){}};
+const stat=(sk,ok)=>{const s=SAVE.stats[sk]||(SAVE.stats[sk]={ok:0,n:0});s.n++;if(ok)s.ok++;save()};
+
+/* ================= ses ================= */
+const Snd={ctx:null,playing:false,timer:null,nt:0,st:0,
+ init(){ if(this.ctx)return; try{const C=window.AudioContext||window.webkitAudioContext; if(!C)return;
+   const c=this.ctx=new C(); this.mg=c.createGain(); this.mg.gain.value=SAVE.music?.55:0; this.mg.connect(c.destination);
+   this.sg=c.createGain(); this.sg.gain.value=1; this.sg.connect(c.destination);
+   const b=c.createBuffer(1,Math.floor(c.sampleRate*.2),c.sampleRate),d=b.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1; this.noise=b;
+ }catch(e){this.ctx=null} },
+ resume(){ if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume().catch(()=>{}) },
+ tone(f,t,d,type,v,dest){ const c=this.ctx,o=c.createOscillator(),g=c.createGain(); o.type=type; o.frequency.value=f;
+   g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(v,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+d);
+   o.connect(g); g.connect(dest); o.start(t); o.stop(t+d+.05) },
+ hat(t){ const c=this.ctx,s=c.createBufferSource(),g=c.createGain(),f=c.createBiquadFilter(); s.buffer=this.noise; f.type='highpass'; f.frequency.value=7000;
+   g.gain.setValueAtTime(.05,t); g.gain.exponentialRampToValueAtTime(.0001,t+.05); s.connect(f); f.connect(g); g.connect(this.mg); s.start(t); s.stop(t+.06) },
+ sfx(n,x){ if(!SAVE.sfx||!this.ctx)return; const t=this.ctx.currentTime+.01,D=this.sg; const T=(f,o,d,ty,v)=>this.tone(f,t+o,d,ty||'square',v||.09,D);
+   if(n==='click')T(660,0,.06,'square',.05);
+   else if(n==='ok')[523,659,784,1047].forEach((f,i)=>T(f,i*.07,.16,'triangle',.13));
+   else if(n==='bad'){T(300,0,.14,'sawtooth',.06);T(220,.12,.22,'sawtooth',.06)}
+   else if(n==='hop')T(380+(x||0)*12,0,.1,'square',.07);
+   else if(n==='win')[523,659,784,1047,784,1047,1319].forEach((f,i)=>T(f,i*.11,.2,'triangle',.14));
+   else if(n==='star'){T(1319,0,.3,'sine',.12);T(1760,.08,.3,'sine',.1)} },
+ start(){ if(!this.ctx||this.playing)return; this.playing=true; this.nt=this.ctx.currentTime+.1; this.st=0; this.timer=setInterval(()=>this.sched(),60) },
+ stop(){ clearInterval(this.timer); this.playing=false },
+ sched(){ const e=60/124/2; while(this.nt<this.ctx.currentTime+.25){ this.step(this.st,this.nt,e); this.nt+=e; this.st++ } },
+ step(s,t,e){ const bar=Math.floor(s/8)%4,k=s%8,loop=Math.floor(s/32)%2;
+   const CH=[[261.63,329.63,392],[220,261.63,329.63],[174.61,220,261.63],[196,246.94,293.66]],root=[130.81,110,87.31,98][bar];
+   const SC=[523.25,587.33,659.25,783.99,880,1046.5],MEL=[[2,-1,3,2,4,-1,3,2],[4,-1,5,4,3,-1,2,-1],[3,2,0,-1,1,2,3,-1],[1,-1,2,3,2,-1,1,-1]];
+   if(k%4===0)this.tone(root,t,e*1.8,'triangle',.22,this.mg);
+   this.tone(CH[bar][[0,1,2,1,0,1,2,1][k]]*2,t,e*.9,'triangle',.05,this.mg);
+   const m=MEL[bar][k]; if(m>=0)this.tone(SC[m],t,e*.85,loop?'triangle':'square',loop?.09:.04,this.mg);
+   if(k%2===1)this.hat(t) },
+ setMusic(on){ if(!this.ctx)return; this.mg.gain.setTargetAtTime(on?.55:0,this.ctx.currentTime,.05) }
+};
+document.addEventListener('visibilitychange',()=>{ if(!Snd.ctx)return; if(document.hidden)Snd.ctx.suspend().catch(()=>{}); else Snd.resume() });
+
+/* ================= maskot ================= */
+function mascot(mood,size){ mood=mood||'happy'; size=size||96;
+ const mouth={happy:'<path d="M50 70q10 10 20 0" stroke="#3b1d5e" stroke-width="3.5" fill="none" stroke-linecap="round"/>',
+  think:'<ellipse cx="60" cy="73" rx="4" ry="3.5" fill="#3b1d5e"/>',
+  wow:'<ellipse cx="60" cy="73" rx="6" ry="7" fill="#3b1d5e"/>',
+  sad:'<path d="M50 77q10-8 20 0" stroke="#3b1d5e" stroke-width="3.5" fill="none" stroke-linecap="round"/>'}[mood]||'';
+ return `<svg class="mascot" viewBox="0 0 120 120" width="${size}" height="${size}" role="img" aria-label="Pıtır"><ellipse cx="60" cy="112" rx="32" ry="6" fill="rgba(0,0,0,.15)"/>
+ <g class="bob"><line x1="60" y1="24" x2="60" y2="11" stroke="#6a3fe6" stroke-width="4" stroke-linecap="round"/><circle cx="60" cy="9" r="6" fill="#ffcf33"/>
+ <ellipse cx="46" cy="106" rx="11" ry="6" fill="#ff8a1f"/><ellipse cx="74" cy="106" rx="11" ry="6" fill="#ff8a1f"/>
+ <path d="M26 66q0-44 34-44t34 44q0 38-34 38T26 66z" fill="#8b5cf6"/>
+ <ellipse cx="60" cy="86" rx="22" ry="16" fill="#efe8ff"/>
+ <path d="M60 74a13 13 0 0 0 0 26z" fill="#2f6fe8"/><path d="M60 74a13 13 0 0 1 0 26z" fill="#ff8a1f"/>
+ <circle cx="46" cy="54" r="9" fill="#fff"/><circle cx="74" cy="54" r="9" fill="#fff"/>
+ <circle cx="${mood==='think'?48:47}" cy="${mood==='think'?51:55}" r="4.5" fill="#27214d"/><circle cx="${mood==='think'?76:75}" cy="${mood==='think'?51:55}" r="4.5" fill="#27214d"/>
+ <ellipse cx="36" cy="68" rx="6" ry="4" fill="#ff8fc0" opacity=".8"/><ellipse cx="84" cy="68" rx="6" ry="4" fill="#ff8fc0" opacity=".8"/>${mouth}</g></svg>`;
+}
+
+/* ================= görsel yardımcılar ================= */
+const EM=['🔴','🔵','🟡','🟢','🟣','🟠','⭐','🌙','🍎','🍌','🐱','🐶','🌸','🍀','🚗','🎈'];
+function dotsHTML(n,e,paired){ let h='<div class="dots">';
+ if(paired){for(let i=0;i<n;i+=2){const lone=i+1>=n;h+=`<span class="pair${lone?' lone':''}">${e}${lone?'':e}</span>`}}
+ else for(let i=0;i<n;i++)h+=`<span class="dot">${e}</span>`;
+ return h+'</div>'; }
+function seqHTML(arr,o){ o=o||{}; let h='<div class="seq">';
+ arr.forEach((v,i)=>{ const q=i===o.blank; h+=`<span class="box${q?' q':''}${o.color&&!q?(even(v)?' ev':' od'):''}">${q?'❓':v}</span>`; if(o.jumps&&i<arr.length-1)h+=`<span class="jump">${o.jumps[i]}</span>`; });
+ if(o.tail)h+='<span class="box q">❓</span>'; return h+'</div>'; }
+function digitStrip(d){ return '<div class="digits">'+[0,1,2,3,4,5,6,7,8,9].map(x=>`<span class="dg ${even(x)?'ev':'od'}${x===d?' hl':''}">${x}</span>`).join('')+'</div><div class="dleg"><span class="ev">0 2 4 6 8 → ÇİFT</span><span class="od">1 3 5 7 9 → TEK</span></div>'; }
+function barChart(cats,o){ o=o||{}; const unit=o.unit||13,mx=Math.max.apply(null,cats.map(c=>c.v).concat([2])),top=Math.max(o.ymax||0,Math.ceil(mx/2)*2);
+ let grid=''; for(let i=0;i<=top;i++)grid+=`<div class="gl${i%2?' mi':''}" style="bottom:${i*unit}px">${i%2===0?`<span>${i}</span>`:''}</div>`;
+ const cols=cats.map(c=>`<div class="col"><div class="bar ${c.cls||''}" style="height:${c.v*unit}px">${o.vals!==false?`<b>${c.v}</b>`:''}</div></div>`).join('');
+ const labs=cats.map(c=>`<div class="cl">${c.label}${c.sub?`<small>${c.sub}</small>`:''}</div>`).join('');
+ return `<div class="chart"><div class="plot" style="height:${top*unit}px;margin-top:26px">${grid}<div class="cols">${cols}</div></div><div class="labs">${labs}</div></div>`; }
+function boardHTML(max,o){ o=o||{}; let h=`<div class="board"${o.id?` id="${o.id}"`:''}>`;
+ for(let n=0;n<=max;n++)h+=`<div class="cell ${even(n)?'ev':'od'}" data-n="${n}">${n}${n===o.start&&o.flagStart?'<i class="flag">🚩</i>':''}${n===o.target?'<i class="flag">🏁</i>':''}</div>`;
+ return h+'</div>'; }
+const boardMax=m=>Math.max(19,Math.ceil((m+1)/10)*10-1);
+function animate(board,trace,cb){ if(!board){cb&&cb('done');return} const cells=$$('.cell',board); cells.forEach(c=>c.classList.remove('here','seen'));
+ let i=0; (function step(){ cells.forEach(c=>c.classList.remove('here')); const c=cells[trace[i]]; if(!c){cb&&cb('out',i);return}
+  c.classList.add('here','seen'); Snd.sfx('hop',trace[i]); i++; if(i<trace.length)setTimeout(step,520); else setTimeout(()=>cb&&cb('done',i),600) })(); }
+function houseHTML(nums,color){ return '<div class="houses">'+nums.map(n=>`<button class="house${color?' '+(even(n)?'ev':'od'):''}" data-act="mark">🏠<b>${n}</b></button>`).join('')+'</div>'; }
+
+/* mini robot dili */
+function run(start,prog){ let v=start;const trace=[v];
+ const ex=st=>{for(const s of st){ if(s.k==='add'){v+=s.n;trace.push(v)} else if(s.k==='rep'){for(let i=0;i<s.n;i++)ex(s.body)} else if(s.k==='if'){ex(even(v)?s.then:s.else)} }};
+ ex(prog); return {final:v,trace}; }
+function progHTML(start,prog){
+ const blk=st=>st.map(s=>{
+  if(s.k==='add')return `<div class="blk add">${s.n>=0?'➕ '+s.n+' ileri zıpla':'➖ '+(-s.n)+' geri zıpla'}</div>`;
+  if(s.k==='rep')return `<div class="blk rep">🔁 ${s.n} kez tekrarla</div><div class="inner">${blk(s.body)}</div>`;
+  if(s.k==='if')return `<div class="blk if">❓ Eğer sayı <b>çiftse</b></div><div class="inner">${blk(s.then)}</div><div class="blk if">↪ Değilse (<b>tekse</b>)</div><div class="inner">${blk(s.else)}</div>`;
+ }).join('');
+ return `<div class="prog-code"><div class="blk st">🚩 Başla: ${start}</div>${blk(prog)}<div class="blk st">🏁 Dur</div></div>`; }
+
+/* ================= soru yapıcıları ================= */
+function mkChoice(o){ const c=String(o.correct); let ws=[...new Set((o.wrongs||[]).map(String))].filter(x=>x!==c);
+ ws=shuffle(ws).slice(0,o.max||3); let opts=o.order?o.order.slice():[c].concat(ws);
+ if(o.sort)opts.sort((a,b)=>a-b); else if(!o.order)opts=shuffle(opts);
+ return Object.assign({type:'choice'},o,{options:opts,answer:c}); }
+function numChoice(o,c,cands){ const ws=[]; const add=v=>{if(Number.isFinite(v)&&v>=0&&v!==c&&!ws.includes(v))ws.push(v)};
+ cands.forEach(add); [1,-1,2,-2,10,-10,3,-3,5].forEach(d=>{if(ws.length<3)add(c+d)});
+ return mkChoice(Object.assign({},o,{correct:c,wrongs:ws,sort:true})); }
+const TC=(correct)=>({order:['TEK','ÇİFT'],correct,wrongs:[correct==='TEK'?'ÇİFT':'TEK']});
+
+const G={},SK={};
+const reg=(name,skill,fn)=>{G[name]=fn;SK[name]=skill};
+
+/* ---- Dünya 1 ---- */
+reg('pairs','tc',t=>{ const n=t===1?rnd(1,10):rnd(11,20),e=pick(['🎈','⭐','🍎','🦋','🍪','🐞','🌸','🧩']),ev=even(n);
+ const A='Yalnız kalan yok → ÇİFT',B='1 tane yalnız kalır → TEK';
+ return mkChoice({key:'pairs'+n,prompt:t===1?`<b>${n}</b> ${e} ikişerli gruplandı. Yalnız kalan var mı?`:`<b>${n}</b> tane ${e} var. İkişerli eşleştirirsek ne olur?`,
+  visual:dotsHTML(n,e,t===1),correct:ev?A:B,wrongs:[ev?B:A],hint:'Her ikili grup bir eş olur. Eşsiz kalan var mı? Onu ara!',hintVisual:dotsHTML(n,e,true),
+  explain:ev?`${n} tanenin hepsi eşleşti, yalnız kalan yok. Bu yüzden ${n} bir <b>çift</b> sayıdır.`:`${n} tane eşleşince 1 tanesi eşsiz kalır. Bu yüzden ${n} bir <b>tek</b> sayıdır.`}); });
+reg('decide','tc',t=>{ const n=t===1?rnd(1,20):t===2?rnd(21,99):rnd(101,999);
+ return mkChoice(Object.assign(TC(pw(n)==='çift'?'ÇİFT':'TEK'),{key:'dec'+n,prompt:`<span class="big">${n}</span> sayısı tek mi, çift mi?`,
+  hint:'Sayının sadece <b>birler basamağına</b> bak!',hintVisual:digitStrip(n%10),
+  explain:`${n} sayısının birler basamağı <b>${n%10}</b>. ${n%10} ${pw(n)} olduğu için ${n} sayısı <b>${pw(n)}</b>.`})); });
+reg('digit','tc',t=>{ const kind=pick(['çift','tek']),gen=()=>t===1?rnd(1,20):t===2?rnd(21,99):rnd(101,999);
+ let c;do{c=gen()}while(pw(c)!==kind); const ws=new Set();let g=0;while(ws.size<3&&g++<200){const w=gen();if(pw(w)!==kind&&w!==c)ws.add(w)}
+ return mkChoice({key:'dig'+c+kind,prompt:`Hangisi <b>${kind}</b> sayıdır?`,correct:c,wrongs:[...ws],sort:true,layout:'grid',hint:'Her sayının birler basamağına bak.',hintVisual:digitStrip(-1),
+  explain:`${c} sayısının birler basamağı ${c%10}. Bu yüzden ${c} bir ${kind} sayıdır.`}); });
+
+/* ---- Dünya 2 ---- */
+reg('sort','tc',t=>{ const n=t===1?6:8,lo=t===1?1:t===2?10:100,hi=t===1?20:t===2?99:999; let nums;
+ do{nums=uniqN(n,lo,hi)}while(nums.filter(even).length<2||nums.filter(x=>!even(x)).length<2);
+ return {type:'sort',key:'sort'+nums.join('-'),prompt:'Her sayıya dokun ve sepetini seç: <span class="tag od">1 kez = TEK</span> <span class="tag ev">2 kez = ÇİFT</span>',
+  items:nums.map(x=>({id:x,label:String(x),truth:even(x)?'cift':'tek'})),hint:'Sayının birler basamağına bak: 0, 2, 4, 6, 8 ise çift.',hintVisual:digitStrip(-1),
+  explain:nums.map(x=>`${x} → ${pw(x)}`).join(', ')+'.'}; });
+reg('pickEven','tc',t=>{ const kind=pick(['çift','tek']),[lo,hi,n]=t===1?[1,20,10]:t===2?[20,70,12]:[100,500,12]; let nums,k=0;
+ do{nums=uniqN(n,lo,hi);k=nums.filter(x=>pw(x)===kind).length}while(k<3||k>n-3);
+ return {type:'pick',key:'pick'+nums.join('-')+kind,prompt:`<b>${kind}</b> sayıların hepsini seç!`,items:nums.sort((a,b)=>a-b).map(x=>({id:x,label:String(x),truth:pw(x)===kind})),
+  hint:`Birler basamağı ${kind==='çift'?'0, 2, 4, 6, 8':'1, 3, 5, 7, 9'} olanları seç.`,hintVisual:digitStrip(-1),
+  explain:`${cap1(kind)} sayılar: ${nums.filter(x=>pw(x)===kind).join(', ')}.`}; });
+reg('neighbor','tc',t=>{ const kind=pick(['çift','tek']);
+ if(t===3){ const a=rnd(11,60),b=a+rnd(9,24),list=[]; for(let x=a+1;x<b;x++)if(pw(x)===kind)list.push(x);
+  return {type:'input',key:'nb3'+a+'-'+b+kind,prompt:`<b>${a}</b> ile <b>${b}</b> arasında (${a} ve ${b} sayılmaz) kaç tane <b>${kind}</b> sayı vardır?`,answer:list.length,
+   hint:`${a+1} sayısından başla. ${cap1(kind)} sayıları tek tek yaz ve say.`,explain:`${cap1(kind)} sayılar: ${list.join(', ')}. Hepsi <b>${list.length}</b> tane.`}; }
+ const n=t===1?rnd(1,18):rnd(21,98),after=t===1; let m=after?n+1:n-1; while(pw(m)!==kind)m+=after?1:-1;
+ return numChoice({key:'nb'+t+'-'+n+kind,prompt:`<b>${n}</b> sayısından ${after?'sonra':'önce'} gelen ilk <b>${kind}</b> sayı hangisidir?`,
+  hint:`${n} sayısından ${after?'ileri':'geri'} doğru tek tek say, ${kind} olanı yakala.`,explain:`${n} sayısının ${after?'sonrasında':'öncesinde'} ilk ${kind} sayı <b>${m}</b>.`},m,[n+1,n-1,n+2,n-2]); });
+
+/* ---- Dünya 3 ---- */
+reg('shape','or',t=>{ const em=sample(EM,4);
+ const units=t===1?[[0,1],[0,0,1],[0,1,1]]:t===2?[[0,1,2],[0,0,1,1],[0,1,1,2],[0,1,0,2]]:[[0,1],[0,1,2],[0,0,1,1],[0,1,1]];
+ const u=pick(units),L=u.length,at=i=>em[u[i%L]],unitV='<div class="cap">Tekrar eden birim:</div>'+seqHTML(u.map(x=>em[x]));
+ let visual,prompt,ans,hint,explain,key;
+ if(t===1){ const len=L*2+rnd(0,1); visual=seqHTML(Array.from({length:len},(_,i)=>at(i)),{tail:true}); prompt='Örüntüyü tamamla: <b>Sıradaki şekil</b> hangisi?'; ans=at(len);
+  hint='Tekrar eden bölümü bul, sonra devam ettir.'; explain=`Örüntü ${u.map(x=>em[x]).join(' ')} birimiyle tekrar ediyor. Sıradaki: ${ans}`; key='sh1'+em.join('')+u.join('')+len; }
+ else if(t===2){ const total=L*3,j=rnd(L+1,total-2); visual=seqHTML(Array.from({length:total},(_,i)=>at(i)),{blank:j}); prompt='Örüntüde <b>❓ yerine</b> hangisi gelmeli?'; ans=at(j);
+  hint='Tekrar eden birimi bul, soru işaretinin birimde hangi sırada olduğuna bak.'; explain=`Birim ${u.map(x=>em[x]).join(' ')}. Soru işaretinin yerine ${ans} gelir.`; key='sh2'+em.join('')+u.join('')+j; }
+ else { const n=rnd(11,24); visual=seqHTML(Array.from({length:L*2+2},(_,i)=>at(i)),{tail:true}); const pos=(n-1)%L; ans=at(n-1);
+  prompt=`Bu örüntü böyle sürerse <b>${n}. şekil</b> hangisi olur?`;
+  hint=L===2?'Sıra numarası <b>tekse</b> ilk şekil, <b>çiftse</b> ikinci şekil gelir.':`Birim ${L} şekilden oluşuyor. ${n} sayısını ${L}'e bölünce kalana bak.`;
+  explain=L===2?`${n} sayısı ${pw(n)}. Bu yüzden ${n}. şekil birimin ${even(n)?'2.':'1.'} şekli: ${ans}`:`Birim ${L} şekil. ${n} ÷ ${L} işleminde kalan ${n%L}. ${n}. şekil birimin ${pos+1}. şekli: ${ans}`; key='sh3'+em.join('')+u.join('')+n; }
+ const wr=em.filter(x=>x!==ans);
+ return mkChoice({key,prompt,visual,correct:ans,wrongs:wr,hint,hintVisual:unitV,explain,layout:'grid',emo:true}); });
+function numSeq(kind,len){ const a=[];
+ if(kind==='alt'){const [p,q]=pick([[2,3],[1,3],[2,5],[3,4],[1,2],[10,5]]);let v=rnd(0,6);a.push(v);for(let i=0;i<len-1;i++){v+=i%2?q:p;a.push(v)}return {a,desc:`sırayla +${p} ve +${q}`}}
+ if(kind==='grow'){let v=rnd(1,5);a.push(v);for(let i=1;i<len;i++){v+=i;a.push(v)}return {a,desc:'eklenen sayı her adımda 1 artıyor (+1, +2, +3, ...)'}}
+ const s=pick([2,2,3,4,5,10]);
+ if(kind==='dbl'){let v=rnd(1,3);a.push(v);for(let i=1;i<len;i++){v*=2;a.push(v)}return {a,desc:'her sayı bir öncekinin 2 katı'}}
+ if(kind==='dec'){let v=s*len+rnd(0,6);a.push(v);for(let i=1;i<len;i++){v-=s;a.push(v)}return {a,desc:`her seferinde ${s} azalıyor`,s}}
+ let v=s===2?rnd(0,8):rnd(0,10);a.push(v);for(let i=1;i<len;i++){v+=s;a.push(v)}return {a,desc:`her seferinde ${s} artıyor`,s}; }
+reg('num','or',t=>{
+ if(t===1){ const s=pick([2,2,5,10]),st=s===2?rnd(0,6):rnd(0,4),arr=Array.from({length:5},(_,i)=>st+s*i),nx=st+s*5;
+  return numChoice({key:'num1'+s+'-'+st,prompt:'Sayı örüntüsünde <b>sıradaki sayı</b> kaçtır?',visual:seqHTML(arr,{tail:true}),hint:'Yan yana iki sayı arasındaki farkı bul.',
+   hintVisual:seqHTML(arr,{color:true,jumps:arr.slice(1).map(()=>'+'+s)}),explain:`Her seferinde ${s} ekleniyor: ${arr.join(', ')}, <b>${nx}</b>.`},nx,[nx+s,nx-s,nx+1,nx-1]); }
+ const kind=t===2?pick(['inc','inc','dec']):pick(['alt','grow','dbl']),len=kind==='dbl'?6:t===2?6:7,r=numSeq(kind,len),b=kind==='dbl'?rnd(3,5):t===2?rnd(2,4):rnd(4,6),ans=r.a[b];
+ const hints={inc:'Sayılar arasındaki farkı bul.',dec:'Sayılar arasındaki farkı bul. Sayılar küçülüyor mu, büyüyor mu?',alt:'Farklara bak: Her adımda aynı sayı eklenmiyor!',grow:'Farklara bak: 1, 2, 3 ... diye büyüyor mu?',dbl:'Her sayıyı bir öncekiyle karşılaştır: kaç katı?'};
+ return {type:'input',key:'num'+t+kind+r.a.join(','),prompt:'<b>❓ yerine</b> hangi sayı gelmeli?',visual:seqHTML(r.a,{blank:b}),answer:ans,hint:hints[kind],hintVisual:seqHTML(r.a,{color:true}),
+  explain:`Kural: ${r.desc}. ❓ yerine <b>${ans}</b> gelir.`}; });
+reg('rule','or',t=>{ let arr,c,ws;
+ if(t<3){ const dir=t===1?1:pick([1,-1]),s=pick([2,3,5,10]),st=dir>0?rnd(0,5):s*6+rnd(0,4); arr=Array.from({length:6},(_,i)=>st+dir*s*i); const w=dir>0?'artıyor':'azalıyor',ow=dir>0?'azalıyor':'artıyor';
+  c=`Her seferinde ${s} ${w}`; ws=[`Her seferinde ${s+1} ${w}`,`Her seferinde ${Math.max(1,s-1)} ${w}`,`Her seferinde ${s} ${ow}`,`Her seferinde ${s+2} ${w}`]; }
+ else { const r=numSeq('alt',7); arr=r.a; const m=r.desc.match(/\+(\d+) ve \+(\d+)/),p=m[1],q=m[2]; c=`Sırayla +${p}, +${q} ekleniyor`; ws=[`Hep +${p} ekleniyor`,`Hep +${q} ekleniyor`,`Sırayla +${q}, +${p} ekleniyor`]; }
+ return mkChoice({key:'rule'+t+arr.join(','),prompt:'Bu örüntünün <b>kuralı</b> nedir?',visual:seqHTML(arr),correct:c,wrongs:ws,hint:'Her sayıyla bir sonraki arasındaki farka bak.',
+  hintVisual:seqHTML(arr,{color:true,jumps:arr.slice(1).map((v,i)=>(v-arr[i]>=0?'+':'−')+Math.abs(v-arr[i]))}),explain:`Farklara bakınca kural: <b>${c}</b>.`}); });
+reg('ppat','or',t=>{ const T3=t===3;
+ const s=pick(T3?[2,3,4,5,6,7,10,12]:[2,4,6,10,3,5,7]),st=rnd(1,9),arr=Array.from({length:6},(_,i)=>st+s*i);
+ if(!T3){ const c=even(s)?(even(st)?'Hepsi çift':'Hepsi tek'):'Sırayla tek, çift';
+  return mkChoice({key:'pp'+arr.join(','),prompt:'Bu örüntüdeki sayılar nasıl? İlk iki sayıya iyi bak!',visual:seqHTML(arr),order:['Hepsi tek','Hepsi çift','Sırayla tek, çift'],correct:c,wrongs:[],
+   hint:'Önce ilk sayı tek mi çift mi bak. Sonra eklenen sayı tek mi çift mi?',hintVisual:seqHTML(arr,{color:true}),
+   explain:even(s)?`Her seferinde çift sayı (${s}) eklendiği için tek/çift özelliği hiç değişmiyor. Hepsi ${pw(st)}.`:`Her seferinde tek sayı (${s}) eklendiği için tek/çift özelliği sürekli değişiyor.`}); }
+ const n=rnd(15,30),v=st+s*(n-1);
+ return mkChoice(Object.assign(TC(even(v)?'ÇİFT':'TEK'),{key:'pp3'+st+'-'+s+'-'+n,prompt:`Bu örüntü böyle sürerse <b>${n}. sayı</b> tek mi çift mi olur?`,visual:seqHTML(arr,{tail:true}),
+  hint:even(s)?'Eklenen sayı çift. Tek/çift özelliği değişir mi?':'Eklenen sayı tek. Her adımda tek/çift sırayla değişir. Sıra numarasına bak!',
+  explain:even(s)?`Eklenen ${s} çift olduğu için bütün sayılar ilk sayı gibi ${pw(st)}. ${n}. sayı ${pw(v)}.`:`Eklenen ${s} tek olduğu için sayılar sırayla tek-çift olur. ${n}. sayı ${v}, yani ${pw(v)}.`})); });
+reg('grow','or',t=>{ const a=pick([2,3,4]),b=pick([1,2]),N=t===2?4:rnd(6,9),cols=['','b','c'],f=n=>a*n+b;
+ const fig=n=>`<div><small>Şekil ${n}</small>${'<i class="sq b"></i>'.repeat(b)}${'<i class="sq"></i>'.repeat(a*n)}</div>`;
+ const table='<table class="t"><tr><th>Şekil</th><th>1</th><th>2</th><th>3</th></tr><tr><th>Kare</th><td>'+[1,2,3].map(f).join('</td><td>')+'</td></tr></table>';
+ return {type:'input',key:'grow'+a+b+N,prompt:`Şekiller böyle büyümeye devam ederse <b>${N}. şekilde</b> kaç kare olur?`,visual:`<div class="fig">${[1,2,3].map(fig).join('')}</div>${table}`,answer:f(N),
+  hint:'Her şekilde kaç kare artıyor? Tablodaki sayılar arasındaki farka bak.',hintVisual:seqHTML([1,2,3].map(f),{color:true,jumps:['+'+a,'+'+a]}),
+  explain:`Her şekilde ${a} kare artıyor. Şekil ${N} = ${a} × ${N} + ${b} = <b>${f(N)}</b>.`+(a===2?` (Dikkat: ${a}'şer artınca ve ${b} ile başlayınca hep ${b===1?'tek':'çift'} sayılar çıkıyor!)`:'')}; });
+
+/* ---- Dünya 4 ---- */
+function trAnim(prog,s,max){ const r=run(s,prog); return {r,html:`${progHTML(s,prog)}${boardHTML(max,{id:'vizboard',start:s,flagStart:true})}<button class="btn alt" data-act="runviz">▶ Robotu çalıştır</button>`}; }
+reg('trace','ko',t=>{
+ if(t===1){ const a=pick([1,2,2,2,5,10]),k=rnd(2,5),s=pick([0,0,1,2,3]),prog=[{k:'rep',n:k,body:[{k:'add',n:a}]}],{r,html}=trAnim(prog,s,boardMax(s+a*k));
+  return Object.assign(numChoice({key:'tr1'+a+k+s,prompt:`Robot <b>${s}</b> numaralı kareden başlıyor. Program bitince hangi sayıda durur?`,visual:html,hint:`${a} ileri zıplamayı ${k} kez yap. Sırayla say: ${s}, ${s+a}, ...`,
+   hintVisual:seqHTML(r.trace,{color:true}),explain:`Robot ${r.trace.join(' → ')} yolunu izler. Son durak <b>${r.final}</b>.`},r.final,[s+a*(k-1),s+a*(k+1),s+a*k+1,s+a*k-1]),{trace:r.trace}); }
+ if(t===2){ const a=pick([2,3,4,5]),k=rnd(4,6),s=rnd(0,5),kind=pick(['tek','çift']),prog=[{k:'rep',n:k,body:[{k:'add',n:a}]}],{r,html}=trAnim(prog,s,boardMax(s+a*k)),cnt=r.trace.filter(x=>pw(x)===kind).length;
+  return Object.assign(numChoice({key:'tr2'+a+k+s+kind,prompt:`Robot'un bastığı karelerden (başladığı kare de dahil) kaç tanesi <b>${kind}</b> sayıdır?`,visual:html,hint:'Çalıştır düğmesine bas, robotun bastığı sayıları yaz, sonra ayır.',
+   hintVisual:seqHTML(r.trace,{color:true}),explain:`Robot ${r.trace.join(', ')} sayılarına bastı. Bunların ${cnt} tanesi ${kind}.`},cnt,[cnt+1,cnt-1,r.trace.length-cnt]),{trace:r.trace}); }
+ const s=rnd(1,9),k=rnd(2,4),a=pick([1,2,3]),b=pick([1,2,3,4].filter(x=>x!==a)),mk=(A,B,K)=>[{k:'rep',n:K,body:[{k:'if',then:[{k:'add',n:A}],else:[{k:'add',n:B}]}]}];
+ const prog=mk(a,b,k),r0=run(s,prog),alts=[run(s,mk(b,a,k)).final,run(s,mk(a,b,k-1)).final,run(s,mk(a,b,k+1)).final],{r,html}=trAnim(prog,s,boardMax(Math.max.apply(null,r0.trace)));
+ return Object.assign(numChoice({key:'tr3'+s+k+a+b,prompt:`Robot <b>${s}</b>'den başlıyor. Program bitince hangi sayıda durur?`,visual:html,hint:'Her turda önce sayının tek mi çift mi olduğuna bak, sonra doğru bloğu uygula.',
+  hintVisual:seqHTML(r0.trace,{color:true}),explain:`Robot ${r0.trace.map(x=>x).join(' → ')} yolunu izler. Çift sayıdayken +${a}, tek sayıdayken +${b} ekler. Son durak <b>${r0.final}</b>.`},r0.final,alts),{trace:r0.trace}); });
+reg('cond','ko',t=>{ const s=rnd(3,30),a=pick([2,3,5,10]),b=pick([1,4,6]),prog=[{k:'if',then:[{k:'add',n:a}],else:[{k:'add',n:b}]}],r=run(s,prog),alt=even(s)?s+b:s+a;
+ return numChoice({key:'cond'+s+a+b,prompt:`🧙 Sihirli makineye <b>${s}</b> girdi. Makineden ne çıkar?`,visual:progHTML(s,prog),hint:`Önce ${s} sayısı tek mi çift mi? Ona göre doğru bloğu seç.`,hintVisual:digitStrip(s%10),
+  explain:`${s} sayısı ${pw(s)}. Bu yüzden ${even(s)?`çift bloğu çalışır: ${s} + ${a}`:`tek bloğu çalışır: ${s} + ${b}`} = <b>${r.final}</b>.`},r.final,[alt,s+a+b,s]); });
+function solveBuild(pal,T,maxRows,ev){ const P=(ev?pal.filter(even):pal).slice().sort((x,y)=>y-x); let best=null;
+ (function rec(i,rem,rows){ if(best)return; if(rem===0){best=rows.slice();return} if(i>=P.length||rows.length>=maxRows)return; const s=P[i];
+  for(let k=Math.floor(rem/s);k>=0&&!best;k--){ if(k>0)rows.push({n:s,times:k}); rec(i+1,rem-k*s,rows); if(k>0)rows.pop(); } })(0,T,[]); return best; }
+reg('build','ko',t=>{ let pal,maxRows,T,ev=false;
+ if(t===1){pal=[2];maxRows=1;T=2*rnd(3,6)} else if(t===2){pal=[1,2,5,10];maxRows=3;T=rnd(12,29)} else {pal=[2,3,4,5,10];maxRows=3;ev=true;T=pick([16,18,22,24,26,28,30,32,34,36,38,40])}
+ const sol=solveBuild(pal,T,maxRows,ev),max=boardMax(T+6);
+ return {type:'build',key:'build'+t+'-'+T+(ev?'e':''),pal,maxRows,T,evenOnly:ev,start:0,max,
+  prompt:t===1?`Robot 0'dan başlıyor. 🏁 <b>${T}</b> numaralı kareye ulaşmalı. Sadece <b>+2</b> bloğu var: kaç kez tekrarlamalı?`:
+   t===2?`Robotu <b>${T}</b> numaralı kareye ulaştır! En fazla <b>${maxRows}</b> blok satırı kullanabilirsin.`:
+   `Robotu <b>${T}</b> numaralı kareye ulaştır ama dikkat: Robot sadece <b>çift</b> sayılara basabilir! En fazla <b>${maxRows}</b> satır kullan.`,
+  hint:t===1?`${T} sayısına 2'şer sayarak ulaş. Kaç zıplama gerekir?`:t===2?'Büyük adımlarla başla (+10), kalanı küçük adımlarla tamamla.':'Tek adımlar (+3, +5) robotu tek sayıya götürür. Çift adımları kullan: +2, +4, +10.',
+  explain:'Örnek çözüm: '+(sol||[]).map(r=>`+${r.n} × ${r.times}`).join(', ')+`. Bu yolla robot ${T}'e ulaşır.`}; });
+reg('debug','ko',t=>{ const a=pick([2,3,5]),k=rnd(3,6),T=a*k,wk=pick([k-1,k+1]),prog=[{k:'rep',n:wk,body:[{k:'add',n:a}]}],r=run(0,prog);
+ const fx=[{t:`Tekrar sayısını ${k} yap`,v:k*a},{t:`Tekrar sayısını ${k+2} yap`,v:(k+2)*a},{t:`Zıplamayı ${a+1} yap`,v:wk*(a+1)},{t:`Zıplamayı ${Math.max(1,a-1)} yap`,v:wk*Math.max(1,a-1)},{t:`Tekrar sayısını ${wk+(wk<k?-1:1)} yap`,v:(wk+(wk<k?-1:1))*a}];
+ const ws=fx.slice(1).filter(f=>f.v!==T).map(f=>f.t);
+ return Object.assign(mkChoice({key:'dbg'+a+k+wk,prompt:`Robot 0'dan başlayıp 🏁 <b>${T}</b> numaralı kareye gitmek istiyor ama program onu <b>${r.final}</b>'e götürüyor. Hatayı nasıl düzeltirsin?`,
+  visual:`${progHTML(0,prog)}${boardHTML(boardMax(Math.max(T,r.final)),{id:'vizboard',target:T,start:0,flagStart:true})}<button class="btn alt" data-act="runviz">▶ Robotu çalıştır</button>`,
+  correct:fx[0].t,wrongs:ws,hint:`${T} sayısına ulaşmak için ${a}'şer zıplama kaç kez yapılmalı? ${T} ÷ ${a} = ?`,explain:`${a} × ${k} = ${T}. Robot ${k} kez ${a} zıplamalı. Doğru düzeltme: <b>${fx[0].t}</b>.`}),{trace:r.trace}); });
+
+/* ---- Dünya 5 ---- */
+const FR=[{e:'🍎',n:'Elma'},{e:'🍌',n:'Muz'},{e:'🍇',n:'Üzüm'},{e:'🍓',n:'Çilek'},{e:'🍊',n:'Portakal'},{e:'🍐',n:'Armut'}];
+function parityCounts(nums){ const od=nums.filter(x=>!even(x)).length; return {tek:od,cift:nums.length-od}; }
+reg('count','vi',t=>{
+ if(t===1){ let nums,k;const kind=pick(['tek','çift']);do{nums=uniqN(8,1,20);k=nums.filter(x=>pw(x)===kind).length}while(k<2||k>6);
+  return numChoice({key:'cnt1'+nums.join('-')+kind,prompt:`Sokaktaki evlerin numaraları bunlar. Kaç evin numarası <b>${kind}</b>?`,visual:houseHTML(nums),hint:'Evlere dokunarak saydıklarını işaretleyebilirsin. Birler basamağına bak!',
+   hintVisual:houseHTML(nums,true),explain:`${cap1(kind)} numaralı evler: ${nums.filter(x=>pw(x)===kind).join(', ')}. Toplam <b>${k}</b> ev.`},k,[k+1,k-1,8-k]); }
+ if(t===2){ let nums,c;do{nums=uniqN(12,10,99);c=parityCounts(nums)}while(c.tek===c.cift);
+  const more=c.tek>c.cift?'Tek numaralı evler':'Çift numaralı evler';
+  return mkChoice({key:'cnt2'+nums.join('-'),prompt:'Hangisinden <b>daha fazla</b> var?',visual:houseHTML(nums),order:['Tek numaralı evler','Çift numaralı evler','Eşit'],correct:more,wrongs:[],
+   hint:'Tek ve çift numaralıları ayrı ayrı say, sonra karşılaştır.',hintVisual:houseHTML(nums,true),explain:`Tek numaralı ${c.tek}, çift numaralı ${c.cift} ev var. <b>${more}</b> daha fazla.`}); }
+ let nums,c;do{nums=uniqN(15,100,999);c=parityCounts(nums)}while(c.tek===c.cift);
+ return {type:'input',key:'cnt3'+nums.join('-'),prompt:'Çift numaralı evlerle tek numaralı evlerin sayısı arasındaki <b>fark</b> kaçtır?',visual:houseHTML(nums),answer:Math.abs(c.tek-c.cift),
+  hint:'Önce tek numaralıları, sonra çift numaralıları say. Sonra büyükten küçüğü çıkar.',hintVisual:houseHTML(nums,true),explain:`Tek: ${c.tek}, çift: ${c.cift}. Fark: <b>${Math.abs(c.tek-c.cift)}</b>.`}; });
+reg('bar','vi',t=>{ const cs=sample(FR,4).map(f=>Object.assign({},f,{v:rnd(2,13)})),cats=cs.map(c=>({label:c.e,sub:c.n,v:c.v}));
+ if(t===1){ const mx=Math.max.apply(null,cs.map(c=>c.v)); if(cs.filter(c=>c.v===mx).length>1)cs[0].v=mx+1; const M=Math.max.apply(null,cs.map(c=>c.v)),w=cs.find(c=>c.v===M),pq=pick(['most','count']);
+  const vis=barChart(cs.map(c=>({label:c.e,sub:c.n,v:c.v})));
+  if(pq==='most')return mkChoice({key:'bar1m'+cs.map(c=>c.v).join(),prompt:'Hangi meyveden <b>en çok</b> var?',visual:vis,correct:w.e+' '+w.n,wrongs:cs.filter(c=>c!==w).map(c=>c.e+' '+c.n),hint:'En yüksek sütunu bul.',explain:`En yüksek sütun ${w.e} ${w.n}: ${w.v} tane.`});
+  const c=pick(cs); return numChoice({key:'bar1c'+cs.map(c=>c.v).join()+c.e,prompt:`${c.e} ${c.n} kaç tane?`,visual:vis,hint:'Sütunun üstündeki sayıya bak.',explain:`${c.e} sütununun yüksekliği <b>${c.v}</b>.`},c.v,[c.v+1,c.v-1,c.v+2]); }
+ const vis=barChart(cats,{vals:false});
+ if(t===2){ let k;do{cs.forEach(c=>c.v=rnd(2,13));k=cs.filter(c=>even(c.v)).length}while(k<1||k>3);
+  return {type:'pick',key:'bar2'+cs.map(c=>c.v).join(),prompt:'Sütunların yüksekliğini çizgilerden oku. Sayısı <b>çift</b> olan meyveleri seç.',visual:barChart(cs.map(c=>({label:c.e,sub:c.n,v:c.v})),{vals:false}),
+   items:cs.map(c=>({id:c.e,label:c.e+' '+c.n,truth:even(c.v),cls:'fruit'})),hint:'Sütunun tepesi hangi çizgiye geliyor? O sayı çift mi?',explain:cs.map(c=>`${c.e} ${c.v} (${pw(c.v)})`).join(', ')+'.'}; }
+ const v3=barChart(cs.map(c=>({label:c.e,sub:c.n,v:c.v})));const kind=pick(['total','diff','odd']);
+ if(kind==='total')return {type:'input',key:'bar3t'+cs.map(c=>c.v).join(),prompt:'Hepsi birlikte <b>kaç meyve</b> var?',visual:v3,answer:sum(cs.map(c=>c.v)),hint:'Dört sütunun değerini topla.',explain:`${cs.map(c=>c.v).join(' + ')} = <b>${sum(cs.map(c=>c.v))}</b>.`};
+ if(kind==='diff'){const vs=cs.map(c=>c.v),d=Math.max.apply(null,vs)-Math.min.apply(null,vs);return {type:'input',key:'bar3d'+vs.join(),prompt:'En çok olan meyve ile en az olan meyve arasındaki <b>fark</b> kaçtır?',visual:v3,answer:d,hint:'En yüksek ve en kısa sütunu bul, sonra çıkar.',explain:`${Math.max.apply(null,vs)} − ${Math.min.apply(null,vs)} = <b>${d}</b>.`}}
+ const odds=cs.filter(c=>!even(c.v));if(!odds.length)cs[0].v=cs[0].v%2?cs[0].v:cs[0].v+1;const od2=cs.filter(c=>!even(c.v)).map(c=>c.v);
+ return {type:'input',key:'bar3o'+cs.map(c=>c.v).join(),prompt:'Sayısı <b>tek</b> olan meyvelerin toplamı kaçtır?',visual:barChart(cs.map(c=>({label:c.e,sub:c.n,v:c.v}))),answer:sum(od2),hint:'Önce hangi sütunların tek sayı olduğunu bul. Sonra onları topla.',explain:`Tek olanlar: ${od2.join(' + ')} = <b>${sum(od2)}</b>.`}; });
+reg('chartbuild','vi',t=>{ const n=t===2?9:15,nums=uniqN(n,1,99),c=parityCounts(nums);
+ return {type:'chart',key:'cb'+nums.join('-'),prompt:'Evlerin numaralarını say, sonra sütunları <b>+</b> ve <b>−</b> ile ayarlayarak grafiği çiz.',items:nums,truth:c,
+  hint:'Evlere dokunarak saydıklarını işaretle. Birler basamağı 0,2,4,6,8 olan çifttir.',explain:`${nums.length} evden ${c.tek} tanesi tek, ${c.cift} tanesi çift numaralı.`}; });
+reg('dataword','vi',t=>{
+ if(t===2){ const T=rnd(15,40),e=rnd(5,T-5);
+  return {type:'input',key:'dw2'+T+'-'+e,prompt:`Bir sokakta <b>${T}</b> ev var. Bunların <b>${e}</b> tanesinin numarası çift. Kaç evin numarası <b>tek</b>?`,answer:T-e,hint:'Toplamdan çift olanları çıkar.',explain:`${T} − ${e} = <b>${T-e}</b> ev tek numaralı.`}; }
+ const b=rnd(4,12),d=rnd(1,5),a=b+d,T=a+b;
+ return {type:'input',key:'dw3'+b+'-'+d,prompt:`Bir sokakta toplam <b>${T}</b> ev var. Tek numaralı evler, çift numaralı evlerden <b>${d} tane fazla</b>. Kaç ev <b>tek</b> numaralı?`,answer:a,
+  hint:`Önce ${d} evi bir kenara ayır. Kalanı eşit ikiye böl.`,explain:`${T} − ${d} = ${T-d}. ${T-d} ÷ 2 = ${b} (çift numaralı). Tek numaralı = ${b} + ${d} = <b>${a}</b>.`}; });
+
+/* ---- Dünya 6 ---- */
+const TF=[
+ [1,'Bir sayının tek mi çift mi olduğunu <b>birler basamağı</b> belirler.',true,'Evet! 348 sayısında yüzler ve onlar ne olursa olsun, birler basamağı 8 olduğu için çifttir.'],
+ [1,'27 çift bir sayıdır.',false,'27 sayısının birler basamağı 7, yani tek bir sayıdır.'],
+ [1,'Çift sayılar 2\'şer 2\'şer sayarken söylenir: 2, 4, 6, 8...',true,'Doğru! 2\'şer ritmik sayınca çift sayılara basarız.'],
+ [1,'Yan yana gelen iki sayıdan biri tek, biri çifttir.',true,'8 ve 9, 15 ve 16... Hep böyle: tek, çift, tek, çift sırayla gider.'],
+ [1,'Bütün çift sayılar 10\'dan büyüktür.',false,'2, 4, 6 ve 8 de çift sayıdır ve 10\'dan küçüktür.'],
+ [1,'Tek sayılar 1, 3, 5, 7 ya da 9 ile biter.',true,'Doğru! Birler basamağı bu rakamlardan biri olan sayı tektir.'],
+ [2,'İki çift sayının toplamı <b>çifttir</b>.',true,'4 + 6 = 10, 12 + 8 = 20. Çiftler eşleşir, yalnız kalan olmaz.'],
+ [2,'İki tek sayının toplamı <b>tektir</b>.',false,'3 + 5 = 8 çift! İki tek sayının yalnız kalanları birbirini bulur.'],
+ [2,'Bir tek sayı ile bir çift sayıyı toplarsak sonuç <b>tek</b> olur.',true,'7 + 4 = 11. Tek sayının yalnızı yine yalnız kalır.'],
+ [2,'Bir sayıya 2 eklersek tek/çift özelliği değişir.',false,'7 + 2 = 9 hâlâ tek. 2 eklemek sadece bir çift daha eklemek demektir.'],
+ [2,'Bir sayıya 1 eklersek tek/çift özelliği değişir.',true,'6 → 7, 7 → 8. Bir eklemek her zaman tek ile çifti değiştirir.'],
+ [2,'Bir sayının 2 katı her zaman çifttir.',true,'7 × 2 = 14. Her şeyin ikişerli grubu olduğu için hep eşleşir.'],
+ [3,'Çift bir sayının yarısı her zaman çifttir.',false,'Karşı örnek: 6\'nın yarısı 3, tektir. Bir tane karşı örnek bulmak iddiayı çürütür!'],
+ [3,'Üç tek sayının toplamı çifttir.',false,'1 + 3 + 5 = 9, tektir. İki tek çift yapar, üçüncü tek ise sonucu tek yapar.'],
+ [3,'Rakamları toplamı çift olan her sayı çifttir.',false,'Karşı örnek: 11. Rakamları 1 + 1 = 2 çift, ama 11 tektir.'],
+ [3,'Bir tek sayı ile bir çift sayının <b>çarpımı</b> çifttir.',true,'3 × 4 = 12. Çarpanlardan biri çiftse, sonuç hep çifttir.'],
+ [3,'İki tek sayının çarpımı tektir.',true,'3 × 5 = 15, 7 × 9 = 63. Tek ile tek çarpılınca tek kalır.'],
+ [3,'Yan yana iki sayının toplamı her zaman <b>tektir</b>.',true,'4 + 5 = 9, 9 + 10 = 19. Biri tek biri çift olduğu için toplam tektir.'],
+ [3,'Hem tek hem çift olan bir sayı vardır.',false,'Bir sayı ya eşleşir (çift) ya da bir tane artar (tek). İkisi birden olamaz.'],
+ [3,'Dört tane tek sayıyı toplarsak sonuç çift olur.',true,'1 + 3 + 5 + 7 = 16. İkişerli gruplayınca her ikisi çift eder.']];
+reg('tf','ed',t=>{ const it=pick(TF.filter(x=>x[0]===t));
+ return mkChoice({key:'tf'+it[1],prompt:'Bu iddia <b>doğru mu, yanlış mı?</b><br><span class="big" style="font-size:1.35rem">“'+it[1]+'”</span>',order:['Doğru','Yanlış'],correct:it[2]?'Doğru':'Yanlış',wrongs:[],
+  hint:t===3?'Bir <b>karşı örnek</b> bulmaya çalış: iddiayı bozan tek bir sayı yeter!':'Küçük sayılarla dene: 2, 3, 4, 5 ...',explain:it[3]}); });
+reg('mistake','ed',t=>{ const lo=t===2?10:100,hi=t===2?99:999; let nums,tk,cf;
+ do{nums=uniqN(6,lo,hi);tk=nums.filter(x=>!even(x));cf=nums.filter(even)}while(tk.length<2||cf.length<2);
+ const w=pick(nums),tl=tk.filter(x=>x!==w),cl=cf.filter(x=>x!==w); if(even(w))tl.push(w); else cl.push(w);
+ return mkChoice({key:'mis'+nums.join('-'),prompt:'Selin sayıları sepetlere ayırdı ama <b>bir sayıyı yanlış sepete</b> koydu. Hangisi?',
+  visual:`<div class="baskets"><div class="od"><h4>TEK SEPETİ</h4>${shuffle(tl).join(' • ')}</div><div class="ev"><h4>ÇİFT SEPETİ</h4>${shuffle(cl).join(' • ')}</div></div>`,
+  correct:w,wrongs:nums.filter(x=>x!==w),max:5,sort:true,layout:'grid',hint:'Her sayının birler basamağına bak. Hangisi sepetine uymuyor?',hintVisual:digitStrip(-1),
+  explain:`${w} sayısı ${pw(w)} ama ${even(w)?'tek':'çift'} sepetine konmuş. Birler basamağı ${w%10}.`}); });
+reg('sumrule','ed',t=>{ const kind=pick(['çift','tek']),R=(l,h)=>rnd(l,h);
+ const num=p=>{let x;do{x=R(11,89)}while(pw(x)!==p);return x};
+ let exprs=[],c,why;
+ if(t===2||rnd(0,1)){ // toplam / fark
+  const mk=p=>{const op=pick(['+','−']);let a=R(11,89),b;do{b=R(11,a>12?a-1:89)}while(false);const ta=pw(a),tb=pw(b);return {a,b,op,par:ta===tb?'çift':'tek',s:`${Math.max(a,b)} ${op} ${Math.min(a,b)}`,v:op==='+'?a+b:Math.abs(a-b)}};
+  const all=[];let g=0;while(all.length<40&&g++<400){const e=mk();if(!all.find(x=>x.s===e.s))all.push(e)}
+  const good=all.filter(e=>e.par===kind),bad=all.filter(e=>e.par!==kind);
+  c=pick(good);exprs=[c].concat(sample(bad,3)); why=`İşlemlerin sonucu: ${exprs.map(e=>e.s+' = '+e.v).join(', ')}.`;
+  var rule='Tek ± tek = çift, çift ± çift = çift, tek ± çift = tek.'; }
+ else { if(rnd(0,1)){ // çarpım
+   const mk=()=>{const a=R(3,19),b=R(3,19);return {s:`${a} × ${b}`,v:a*b,par:pw(a*b)}};
+   const all=[];let g=0;while(all.length<40&&g++<400){const e=mk();if(!all.find(x=>x.s===e.s))all.push(e)}
+   c=pick(all.filter(e=>e.par===kind));exprs=[c].concat(sample(all.filter(e=>e.par!==kind),3)); why=`Sonuçlar: ${exprs.map(e=>e.s+' = '+e.v).join(', ')}.`; var rule='Çarpanlardan biri çiftse sonuç çifttir. İki çarpan da tekse sonuç tektir.'; }
+  else { const mk=()=>{const a=R(5,29),b=R(5,29),d=R(5,29);return {s:`${a} + ${b} + ${d}`,v:a+b+d,par:pw(a+b+d)}};
+   const all=[];let g=0;while(all.length<40&&g++<400){const e=mk();if(!all.find(x=>x.s===e.s))all.push(e)}
+   c=pick(all.filter(e=>e.par===kind));exprs=[c].concat(sample(all.filter(e=>e.par!==kind),3)); why=`Sonuçlar: ${exprs.map(e=>e.s+' = '+e.v).join(', ')}.`; var rule='Toplamda kaç tane <b>tek</b> sayı var? Tek sayıların sayısı çiftse sonuç çift, tekse sonuç tek olur.'; } }
+ return mkChoice({key:'sr'+exprs.map(e=>e.s).join('|'),prompt:`Hangi işlemin sonucu <b>${kind}</b> sayıdır? <span class="cap">(Hesaplamadan düşünmeyi dene!)</span>`,correct:c.s,wrongs:exprs.slice(1).map(e=>e.s),layout:'two',
+  hint:'Sayıların tek mi çift mi olduğuna bak. Kural: '+rule,explain:`${why} Kural: ${rule}`}); });
+reg('secret','ps',t=>{ const lo=t===2?10:100,hi=t===2?99:999,cand0=[];for(let i=lo;i<=hi;i++)cand0.push(i);
+ for(let att=0;att<300;att++){ const sec=rnd(lo+(t===2?5:20),hi-5); const dg=n=>String(n).split('').map(Number),ds=dg(sec),sm=sum(ds);
+  const defs=[
+   ()=>({t:`${cap1(pw(sec))} sayıdır.`,f:n=>pw(n)===pw(sec)}),
+   ()=>{const w=t===2?rnd(3,12):rnd(20,60),a=sec-rnd(2,w),b=sec+rnd(2,w);return {t:`<b>${a}</b> ile <b>${b}</b> arasındadır.`,f:n=>n>a&&n<b}},
+   ()=>({t:`Rakamlarının toplamı <b>${sm}</b>.`,f:n=>sum(dg(n))===sm}),
+   ()=>t===2?{t:`Onlar basamağındaki rakam <b>${ds[0]}</b>.`,f:n=>dg(n)[0]===ds[0]}:{t:`Yüzler basamağındaki rakam <b>${ds[0]}</b>.`,f:n=>dg(n)[0]===ds[0]},
+   ()=>t===2?{t:`Birler basamağı, onlar basamağından ${ds[1]>ds[0]?'büyük':ds[1]<ds[0]?'küçük':'eşit'}.`,f:n=>{const d=dg(n);return Math.sign(d[1]-d[0])===Math.sign(ds[1]-ds[0])}}:{t:`Onlar basamağındaki rakam ${pw(ds[1])}.`,f:n=>pw(dg(n)[1])===pw(ds[1])},
+   ()=>({t:sec%5===0?'5\'er sayarken söylenir (5\'in katıdır).':'5\'er sayarken <b>söylenmez</b>.',f:n=>(n%5===0)===(sec%5===0)}),
+   ()=>t===3?{t:`Birler basamağındaki rakam ${ds[2]>5?'5\'ten büyük':'5\'ten küçük ya da 5\'e eşit'}.`,f:n=>(n%10>5)===(ds[2]>5)}:{t:`Birler basamağındaki rakam ${ds[1]>4?'4\'ten büyük':'4\'ten küçük ya da 4\'e eşit'}.`,f:n=>(n%10>4)===(ds[1]>4)}];
+  let cand=cand0.slice();const clues=[];
+  for(const d of shuffle(defs)){ const cl=d(),nc=cand.filter(cl.f); if(nc.length<cand.length&&nc.includes(sec)){cand=nc;clues.push(cl)} if(cand.length===1||clues.length>=6)break; }
+  if(cand.length===1&&clues.length>=(t===2?3:4)&&clues.length<=(t===2?5:6))
+   return {type:'input',key:'sec'+sec,prompt:'🕵️ <b>Gizli sayıyı bul!</b> Bütün ipuçlarına uyan tek bir sayı var.',visual:`<ol class="clues">${clues.map(c=>`<li>${c.t}</li>`).join('')}</ol>`,answer:sec,
+    hint:'İpuçlarını tek tek uygula: Önce aralığı ya da basamağı kullanıp sayıları daralt, sonra tek/çift ipucuna bak.',explain:`Bütün ipuçlarına uyan tek sayı <b>${sec}</b>.`}; }
+ return {type:'input',key:'sec-fb',prompt:'Gizli sayı: 2 basamaklı, çift, onlar basamağı 4, birler basamağı 8. Kaç?',answer:48,hint:'Onlar 4, birler 8.',explain:'48.'}; });
+reg('word','ps',t=>{
+ if(t===1){ const n=rnd(6,19),e=pick(['🧒','👧','👦']),A='Evet, 1 çocuk yalnız kalır',B='Hayır, herkes bir eş bulur';
+  return mkChoice({key:'wd1'+n,prompt:`<b>${n}</b> çocuk ikişerli el ele tutuşup sıraya giriyor. Yalnız kalan çocuk olur mu?`,visual:dotsHTML(n,e,false),correct:even(n)?B:A,wrongs:[even(n)?A:B],order:[A,B],
+   hint:'Çocukları ikişer ikişer eşleştir. Eşsiz kalan var mı?',hintVisual:dotsHTML(n,e,true),explain:`${n} sayısı ${pw(n)}. ${even(n)?'Herkes eşleşir.':'Bir çocuk eşsiz kalır.'}`}); }
+ if(t===2){ const n=rnd(11,39),r=Math.ceil(n/2);
+  return {type:'input',key:'wd2'+n,prompt:`Bir sınıfta <b>${n}</b> öğrenci var. Sıralara <b>ikişer</b> kişi oturacak. En az <b>kaç sıra</b> gerekir?`,answer:r,hint:`${n} sayısını 2'ye böl. Artan öğrenci olursa onun için bir sıra daha gerekir.`,
+   explain:`${n} ÷ 2 = ${Math.floor(n/2)} kalan ${n%2}. ${even(n)?`Tam ${r} sıra yeter.`:`Kalan 1 öğrenci için bir sıra daha lazım: ${r} sıra.`}`}; }
+ let n,o,i;do{n=rnd(15,40);o=rnd(3,9);i=rnd(3,12)}while(n-o<=0);const f=n-o+i,A='Evet, yalnız oturan olur',B='Hayır, herkes bir yolcuyla oturur';
+ return mkChoice({key:'wd3'+n+o+i,prompt:`Bir otobüste <b>${n}</b> yolcu var. Durakta <b>${o}</b> yolcu iniyor, <b>${i}</b> yolcu biniyor. Koltuklar ikişerli. Yolcular ikişerli otururlarsa <b>yalnız oturan</b> olur mu?`,
+  order:[A,B],correct:even(f)?B:A,wrongs:[even(f)?A:B],hint:'Önce otobüste kaç yolcu kaldığını bul. Sonra o sayı tek mi çift mi?',explain:`${n} − ${o} + ${i} = <b>${f}</b>. ${f} sayısı ${pw(f)}, bu yüzden ${even(f)?'herkes eşleşir.':'bir yolcu yalnız oturur.'}`}); });
+
+/* ================= dünyalar ================= */
+const SKN={tc:'Tek-Çift',or:'Örüntü',ps:'Problem Çözme',ed:'Eleştirel Düşünme',vi:'Veri Analizi',ko:'Kodlama'};
+const SKT={tc:'Tek-Çift Ustası',or:'Örüntü Dedektifi',ps:'Problem Çözücü',ed:'Eleştirel Düşünür',vi:'Veri Bilgini',ko:'Kod Kahramanı'};
+const WORLDS=[
+ {id:'w1',emoji:'🎈',name:'Balon Ormanı',sub:'Tek mi, çift mi?',color:'#e0408a',chips:['Tek-Çift'],
+  plan:[['pairs',1],['pairs',1],['decide',1],['pairs',2],['digit',2],['decide',2],['digit',3],['decide',3],['digit',3]],lesson:'w1'},
+ {id:'w2',emoji:'🧺',name:'Sayı Sepetleri',sub:'Ayır, bul, say',color:'#d98200',chips:['Sınıflama','Tek-Çift'],
+  plan:[['sort',1],['pickEven',1],['neighbor',1],['sort',2],['pickEven',2],['neighbor',2],['sort',3],['pickEven',3],['neighbor',3]],lesson:'w2'},
+ {id:'w3',emoji:'🏰',name:'Örüntü Sarayı',sub:'Sıradaki ne?',color:'#12935a',chips:['Örüntü','Problem Çözme'],
+  plan:[['shape',1],['num',1],['rule',1],['shape',2],['num',2],['ppat',2],['shape',3],['num',3],['grow',3]],lesson:'w3'},
+ {id:'w4',emoji:'🤖',name:'Robot Kampı',sub:'Kodla ve zıplat',color:'#2f6fe8',chips:['Kodlama','Algoritma'],
+  plan:[['trace',1],['trace',1],['build',1],['trace',2],['cond',2],['build',2],['trace',3],['debug',3],['build',3]],lesson:'w4'},
+ {id:'w5',emoji:'📊',name:'Veri Laboratuvarı',sub:'Say, çiz, yorumla',color:'#0a8fa8',chips:['Veri Analizi','Grafik'],
+  plan:[['count',1],['bar',1],['bar',2],['count',2],['chartbuild',2],['dataword',2],['count',3],['bar',3],['chartbuild',3]],lesson:'w5'},
+ {id:'w6',emoji:'🕵️',name:'Dedektif Karargâhı',sub:'Neden böyle?',color:'#7048f0',chips:['Eleştirel Düşünme','Problem Çözme'],
+  plan:[['tf',1],['word',1],['tf',2],['mistake',2],['sumrule',2],['secret',2],['tf',3],['sumrule',3],['secret',3]],lesson:'w6'},
+ {id:'w7',emoji:'👑',name:'Büyük Final',sub:'Süper meydan okuma',color:'#d93560',chips:['Hepsi bir arada'],
+  plan:[['digit',3],['ppat',3],['grow',3],['trace',3],['build',3],['chartbuild',3],['tf',3],['word',3],['sumrule',3],['secret',3]],lesson:null}
+];
+
+/* ================= dersler ================= */
+const LESSONS={
+ w1:[
+  {say:'Merhaba, ben Pıtır! Sayıları <b>ikişerli eşleştirebiliriz</b>. Hepsi eşleşirse sayı <b>ÇİFT</b>, eşsiz biri kalırsa <b>TEK</b> olur. Sen de dene: + ve − düğmelerine bas!',
+   html:`<div class="demo"><div id="L-d" style="min-height:96px;width:100%"></div><div class="stepper"><button class="btn sm" data-d="-1" aria-label="Azalt">−</button><span class="big" id="L-n">7</span><button class="btn sm" data-d="1" aria-label="Artır">+</button></div><div class="verdict" id="L-v"></div></div>`,
+   init(el){ let n=7; const up=()=>{ $('#L-n',el).textContent=n; $('#L-d',el).innerHTML=dotsHTML(n,'🎈',true); $('#L-v',el).innerHTML=even(n)?'<span class="tag ev">ÇİFT: hepsi eşleşti!</span>':'<span class="tag od">TEK: 1 balon yalnız kaldı!</span>' };
+    $$('[data-d]',el).forEach(b=>b.onclick=()=>{n=Math.max(1,Math.min(20,n+ +b.dataset.d));Snd.sfx('click');up()}); up(); }},
+  {say:'Büyük sayıları eşleştirmek zor! Kolay bir kural var: sadece <b>birler basamağına</b> bak. Bir sayı yaz ve dene!',
+   html:`<div class="demo"><input class="numin" id="L-in" type="number" inputmode="numeric" min="0" max="99999" value="347" aria-label="Bir sayı yaz"><div class="dspl" id="L-ds"></div><div class="verdict" id="L-v"></div></div>`,
+   init(el){ const inp=$('#L-in',el),up=()=>{ let s=String(Math.max(0,Math.abs(parseInt(inp.value,10)||0))).slice(0,5); const L=s.length;
+     $('#L-ds',el).innerHTML=s.split('').map((c,i)=>`<span class="dsp${i===L-1?' last':''}">${c}</span>`).join(''); const d=+s[L-1];
+     $('#L-v',el).innerHTML=`Birler basamağı <b>${d}</b> → <span class="tag ${even(d)?'ev':'od'}">${even(d)?'ÇİFT':'TEK'}</span>` }; inp.oninput=up; up(); }},
+  {say:'İşte süper kural! Birler basamağı <b>0, 2, 4, 6, 8</b> ise sayı çift, <b>1, 3, 5, 7, 9</b> ise tek. Hazırsan başlayalım!',html:`<div class="demo">${digitStrip(-1)}</div>`}],
+ w2:[
+  {say:'Bu sayı tablosunda <b>çift</b> ya da <b>tek</b> sayıları boyayabilirsin. Boyanan sayılara dikkat et: ne fark ediyorsun?',
+   html:`<div class="demo"><div class="tbl" id="L-t" data-m="none">${Array.from({length:40},(_,i)=>i+1).map(n=>`<div class="cell ${even(n)?'ev':'od'}">${n}</div>`).join('')}</div>
+   <div class="row" style="justify-content:center"><button class="btn alt" data-m="ev">Çiftleri boya</button><button class="btn" style="background:var(--tek);color:var(--on-tek)" data-m="od">Tekleri boya</button><button class="btn ghost" data-m="none">Temizle</button></div><div class="verdict" id="L-v">Çift sayılar alt alta dizildi mi? Sütunlara bak!</div></div>`,
+   init(el){ $$('[data-m]',el).forEach(b=>b.onclick=()=>{$('#L-t',el).dataset.m=b.dataset.m;Snd.sfx('click');$('#L-v',el).innerHTML=b.dataset.m==='ev'?'Çift sayılar hep <b>aynı sütunlarda</b>: 2, 4, 6, 8, 10 ...':b.dataset.m==='od'?'Tek sayılar da kendi sütunlarında: 1, 3, 5, 7, 9 ...':'Çift, tek, çift, tek... sırayla gider.'}); }},
+  {say:'Sayılar sırayla <b>tek, çift, tek, çift</b> diye gider. Yan yana iki sayıdan biri hep tek, biri hep çifttir. Sayılar 2\'şer atlayarak da aynı türde kalır!',
+   html:`<div class="demo">${seqHTML([1,2,3,4,5,6,7,8,9,10],{color:true})}<div class="cap">2'şer sayalım:</div>${seqHTML([2,4,6,8,10,12],{color:true,jumps:['+2','+2','+2','+2','+2']})}${seqHTML([1,3,5,7,9,11],{color:true,jumps:['+2','+2','+2','+2','+2']})}</div>`}],
+ w3:[
+  {say:'<b>Örüntü</b>, tekrar eden bir düzendir. Sıradaki şekli bulabilir misin? Birine dokun!',
+   html:`<div class="demo"><div id="L-s"></div><div class="row" style="justify-content:center"><button class="opt emo" style="min-width:90px" data-a="🍎">🍎</button><button class="opt emo" style="min-width:90px" data-a="🍌">🍌</button></div><div class="verdict" id="L-v"></div></div>`,
+   init(el){ const arr=['🍎','🍌','🍎','🍌','🍎']; $('#L-s',el).innerHTML=seqHTML(arr,{tail:true});
+    $$('[data-a]',el).forEach(b=>b.onclick=()=>{ if(b.dataset.a==='🍌'){Snd.sfx('ok');b.classList.add('right');$('#L-s',el).innerHTML=seqHTML(arr.concat('🍌'));$('#L-v',el).innerHTML='Evet! 🍎 🍌 birimi tekrar ediyor.'}else{Snd.sfx('bad');b.classList.add('wrong');$('#L-v',el).innerHTML='Bir daha bak: 🍎 sonra 🍌 geliyor.'} }); }},
+  {say:'Sayı örüntülerinde sayılar arasındaki <b>farka</b> bakılır. Bir fark seç ve sayıların tek-çift durumuna dikkat et!',
+   html:`<div class="demo"><div class="row" style="justify-content:center"><button class="btn" data-s="2">+2</button><button class="btn" data-s="5">+5</button><button class="btn" data-s="10">+10</button></div><div id="L-s" style="width:100%"></div><div class="verdict" id="L-v"></div></div>`,
+   init(el){ const show=s=>{ const a=Array.from({length:6},(_,i)=>i*s); $('#L-s',el).innerHTML=seqHTML(a,{color:true,jumps:a.slice(1).map(()=>'+'+s)});
+     $('#L-v',el).innerHTML=even(s)?`+${s} çift bir sayı: sayıların hepsi <b>aynı türde</b> kalır.`:`+${s} tek bir sayı: sayılar <b>sırayla tek, çift</b> olur.` }; $$('[data-s]',el).forEach(b=>b.onclick=()=>{Snd.sfx('click');show(+b.dataset.s)}); show(2); }}],
+ w4:[
+  {say:'Bu bir <b>robot</b>! Ona komut veririz, o da sırayla yapar. Buna <b>kodlama</b> denir. Bir zıplama boyu ve tekrar sayısı seç, robotu çalıştır!',
+   html:`<div class="demo">${boardHTML(29,{id:'L-b',start:0,flagStart:true})}<div class="row" style="justify-content:center"><div class="stepper"><span>Zıplama:</span><button class="btn sm" data-a="s-">−</button><b id="L-s">2</b><button class="btn sm" data-a="s+">+</button></div><div class="stepper"><span>Tekrar:</span><button class="btn sm" data-a="k-">−</button><b id="L-k">3</b><button class="btn sm" data-a="k+">+</button></div></div>
+   <div class="prog-code" id="L-p"></div><button class="btn alt" id="L-go">▶ Çalıştır</button></div>`,
+   init(el){ let s=2,k=3; const up=()=>{ $('#L-s',el).textContent=s;$('#L-k',el).textContent=k;$('#L-p',el).innerHTML=`<div class="blk rep">🔁 ${k} kez tekrarla</div><div class="inner"><div class="blk add">➕ ${s} ileri zıpla</div></div>` }; up();
+    $$('[data-a]',el).forEach(b=>b.onclick=()=>{ const a=b.dataset.a; if(a==='s-')s=Math.max(1,s-1); if(a==='s+')s=Math.min(10,s+1); if(a==='k-')k=Math.max(1,k-1); if(a==='k+')k=Math.min(9,k+1); while(s*k>29)k--; Snd.sfx('click'); up(); });
+    $('#L-go',el).onclick=()=>{ const tr=[0];for(let i=0;i<k;i++)tr.push(tr[tr.length-1]+s); animate($('#L-b',el),tr); }; }},
+  {say:'Robotlar <b>karar</b> da verebilir! "Eğer sayı çiftse ... değilse ..." bloğu tek mi çift mi olduğuna bakar. Bir sayı seç!',
+   html:`<div class="demo"><div class="stepper"><button class="btn sm" data-d="-1">−</button><span class="big" id="L-n">6</span><button class="btn sm" data-d="1">+</button></div>
+   ${progHTML('girdi',[{k:'if',then:[{k:'add',n:2}],else:[{k:'add',n:1}]}]).replace('Başla: girdi','Girdi: seçtiğin sayı')}<div class="verdict" id="L-v"></div></div>`,
+   init(el){ let n=6; const up=()=>{ $('#L-n',el).textContent=n; $('#L-v',el).innerHTML=even(n)?`${n} <span class="tag ev">çift</span> → 2 ekle → <b>${n+2}</b>`:`${n} <span class="tag od">tek</span> → 1 ekle → <b>${n+1}</b>` }; up();
+    $$('[data-d]',el).forEach(b=>b.onclick=()=>{n=Math.max(1,Math.min(40,n+ +b.dataset.d));Snd.sfx('click');up()}); }}],
+ w5:[
+  {say:'Bilim insanları <b>veri toplar</b>. Hadi bir deney yapalım: zar at, tek mi çift mi geldiğini say! Zarda 1, 3, 5 tek; 2, 4, 6 çifttir.',
+   html:`<div class="demo"><div class="dice" id="L-dice">🎲</div><div class="row" style="justify-content:center"><button class="btn alt" id="L-1">🎲 Zar At</button><button class="btn" id="L-10">10 kez at</button><button class="btn ghost" id="L-0">Sıfırla</button></div><div id="L-c" style="width:100%"></div><div class="verdict" id="L-v"></div></div>`,
+   init(el){ let tk=0,cf=0; const F=['⚀','⚁','⚂','⚃','⚄','⚅'];
+    const up=msg=>{ $('#L-c',el).innerHTML=barChart([{label:'TEK',v:tk,cls:'od'},{label:'ÇİFT',v:cf,cls:'ev'}],{ymax:Math.max(10,Math.ceil(Math.max(tk,cf)/2)*2),unit:Math.max(8,Math.min(13,Math.floor(150/Math.max(10,Math.max(tk,cf)+2))))});
+      const n=tk+cf; $('#L-v',el).innerHTML=msg||(n>=20?'Sence neden sayılar birbirine yakın? Zarda 3 tek, 3 çift yüz var!':n>0?`${n} kez attın: ${tk} tek, ${cf} çift.`:'Zar atmaya başla!') };
+    const roll=()=>{ const r=rnd(1,6); if(even(r))cf++; else tk++; return r };
+    $('#L-1',el).onclick=()=>{ const r=roll(); $('#L-dice',el).textContent=F[r-1]+' '+r; Snd.sfx('hop',r*2); up(); };
+    $('#L-10',el).onclick=()=>{ for(let i=0;i<10;i++)roll(); Snd.sfx('ok'); up(); };
+    $('#L-0',el).onclick=()=>{ tk=0;cf=0; $('#L-dice',el).textContent='🎲'; up(); }; up(); }},
+  {say:'Grafikte <b>sütun ne kadar yüksekse</b> sayı o kadar büyüktür. Çizgilere bakarak sayıyı okuyabiliriz. Tek sayılar iki çizginin arasında kalır!',
+   html:`<div class="demo">${barChart([{label:'🍎',sub:'Elma',v:6},{label:'🍌',sub:'Muz',v:9},{label:'🍇',sub:'Üzüm',v:4}],{vals:false})}<div class="verdict">Elma: 6 (çift), Muz: 9 (tek), Üzüm: 4 (çift)</div></div>`}],
+ w6:[
+  {say:'Bir dedektif <b>kuralları keşfeder</b>. İki sayı seç, toplamlarının tek mi çift mi olduğuna bak. Üç türlü toplamı da bulursan kuralı keşfetmiş olursun!',
+   html:`<div class="demo"><div class="row" style="justify-content:center;gap:18px"><div class="stepper"><button class="btn sm" data-a="a-">−</button><span class="big" id="L-a">3</span><button class="btn sm" data-a="a+">+</button></div><span class="big">+</span><div class="stepper"><button class="btn sm" data-a="b-">−</button><span class="big" id="L-b">5</span><button class="btn sm" data-a="b+">+</button></div></div>
+   <div class="verdict" id="L-v"></div><table class="t"><tr><th>Toplam</th><th>Sonuç</th></tr><tr><td>Tek + Tek</td><td id="L-1">?</td></tr><tr><td>Çift + Çift</td><td id="L-2">?</td></tr><tr><td>Tek + Çift</td><td id="L-3">?</td></tr></table></div>`,
+   init(el){ let a=3,b=5; const seen={}; const up=()=>{ $('#L-a',el).textContent=a;$('#L-b',el).textContent=b; const s=a+b,ta=pw(a),tb=pw(b); const key=ta===tb?(ta==='tek'?1:2):3;
+     $('#L-v',el).innerHTML=`${a} + ${b} = <b>${s}</b> <span class="tag ${even(s)?'ev':'od'}">${even(s)?'ÇİFT':'TEK'}</span>`; seen[key]=even(s)?'ÇİFT':'TEK';
+     [1,2,3].forEach(i=>{ if(seen[i])$('#L-'+i,el).innerHTML=`<span class="tag ${seen[i]==='ÇİFT'?'ev':'od'}">${seen[i]}</span>` });
+     if(seen[1]&&seen[2]&&seen[3])$('#L-v',el).innerHTML+='<br>🎉 Keşfettin! Aynı türden iki sayı <b>ÇİFT</b>, farklı türden iki sayı <b>TEK</b> yapar.'; };
+    $$('[data-a]',el).forEach(x=>x.onclick=()=>{ const t=x.dataset.a; if(t==='a-')a=Math.max(1,a-1); if(t==='a+')a=Math.min(20,a+1); if(t==='b-')b=Math.max(1,b-1); if(t==='b+')b=Math.min(20,b+1); Snd.sfx('click'); up() }); up(); }}]
+};
+
+/* ================= durum ve görünümler ================= */
+const S={view:'home',world:null,round:null,lesson:null};
+const app=$('#app');
+const wStars=id=>(SAVE.worlds[id]||{}).stars||0;
+const totalStars=()=>WORLDS.reduce((a,w)=>a+wStars(w.id),0);
+const unlocked=i=>i===0||(i<6?wStars(WORLDS[i-1].id)>0:WORLDS.slice(0,6).every(w=>wStars(w.id)>0));
+const starsHTML=n=>'<span class="stars">'+[1,2,3].map(i=>`<span class="${i<=n?'':'off'}">⭐</span>`).join('')+'</span>';
+const PRAISE=['Harika!','Süper!','Bravo!','Muhteşem!','Tam isabet!','Çok güzel!','Yaşasın!'];
+function hud(){ return `<div class="hud"><button class="icon" data-act="map" aria-label="Harita" ${S.view==='map'?'style="visibility:hidden"':''}>🗺️</button><div class="grow"></div>
+ <span class="pill">⭐ ${totalStars()}</span><span class="pill">✨ ${SAVE.xp}</span>
+ <button class="icon" data-act="music" aria-label="Müzik" aria-pressed="${SAVE.music}">${SAVE.music?'🎵':'🔇'}</button><button class="icon" data-act="sfx" aria-label="Ses efektleri" aria-pressed="${SAVE.sfx}">${SAVE.sfx?'🔊':'🔈'}</button></div>`; }
+const VIEWS={};
+VIEWS.home=()=>`<div class="home">
+ <div class="logo"><span class="t">Tek</span> • <span class="c">Çift</span><small>MACERASI</small></div>${mascot('happy',150)}
+ <p style="max-width:460px;font-size:1.2rem">Merhaba! Ben Pıtır. Seninle sayıların gizemini çözeceğiz: tek, çift, örüntüler, robotlar ve daha fazlası!</p>
+ <button class="btn xl" data-act="start">▶ Oyuna Başla</button>
+ <div class="homepills"><span class="tag">🧠 Problem Çözme</span><span class="tag">🔍 Eleştirel Düşünme</span><span class="tag">📊 Veri Analizi</span><span class="tag">🤖 Kodlama</span></div>
+ <p class="cap">🔊 Sesin açık olsun: müzik seni bekliyor!</p></div>`;
+VIEWS.map=()=>{ const sk=Object.keys(SKT).map(k=>{const s=SAVE.stats[k]||{ok:0,n:0},p=s.n?Math.round(s.ok/s.n*100):0;return `<div class="sk"><b><span>${SKT[k]}</span><span>${s.n?p+'%':'–'}</span></b><div class="meter"><i style="width:${p}%"></i></div></div>`}).join('');
+ const ws=WORLDS.map((w,i)=>{ const un=unlocked(i),st=wStars(w.id); return `<div class="card world${un?'':' locked'}" style="--wc:${w.color}"><div class="wico" aria-hidden="true">${un?w.emoji:'🔒'}</div>
+  <div><h3>${i+1}. ${w.name}</h3><div class="sub">${w.sub}</div><div class="chips">${w.chips.map(c=>`<span>${c}</span>`).join('')}</div></div>
+  <div class="go">${starsHTML(st)}<span class="grow"></span>${un?`${w.lesson?`<button class="btn ghost sm" data-act="lesson" data-w="${i}">📖 Ders</button>`:''}<button class="btn" data-act="play" data-w="${i}">${st?'Tekrar Oyna':'▶ Oyna'}</button>`:`<span class="sub">${i===6?'Önce 6 dünyayı bitir':'Önceki dünyayı bitir'}</span>`}</div></div>`}).join('');
+ return `${hud()}<div class="map"><h2>Macera Haritası</h2><div class="card" style="margin-top:10px"><b>Süper Güçlerim</b> <span class="cap">(ilk denemede doğru cevaplar)</span><div class="skills">${sk}</div></div><div class="worlds">${ws}</div>
+ <div class="foot">İlerlemen bu cihazda saklanır. <button data-act="reset">İlerlemeyi sıfırla</button></div></div>`; };
+VIEWS.lesson=()=>{ const L=S.lesson,w=L.w,steps=LESSONS[w.lesson],st=steps[L.i],last=L.i===steps.length-1;
+ return `${hud()}<div class="lesson" style="--wc:${w.color}"><div class="card"><div class="say">${mascot('happy',84)}<div class="bubble">${st.say}</div></div><div class="demo-wrap" id="demo">${st.html}</div>
+ <div class="nav"><button class="btn ghost" data-act="lprev" ${L.i===0?'style="visibility:hidden"':''}>◀ Geri</button><div class="dots-nav">${steps.map((_,i)=>`<i class="${i===L.i?'on':''}"></i>`).join('')}</div><button class="btn ${last?'good':''}" data-act="lnext">${last?'Hadi Oynayalım! ▶':'İleri ▶'}</button></div></div></div>`; };
+VIEWS.quiz=()=>{ const R=S.round,q=R.q,w=R.w,pct=Math.round(R.i/R.queue.length*100);
+ return `<div class="quiz" style="--wc:${w.color}"><div class="qtop"><button class="icon" data-act="quit" aria-label="Çık">✖</button><div class="prog" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><i style="width:${pct}%"></i></div><div class="strk" id="strk">${R.streak>1?'🔥 '+R.streak:''}</div></div>
+ <div class="card qcard"><div class="skill"><b>${SKN[q.skill]}</b><span>Soru ${R.i+1} / ${R.queue.length}</span></div><div class="prompt">${q.prompt}</div>${q.visual?`<div class="visual">${q.visual}</div>`:''}<div class="ans" id="ans">${answerHTML(q)}</div></div>
+ <div id="fb" class="fb" aria-live="polite"></div><div class="actions" id="acts"></div></div>`; };
+VIEWS.result=()=>{ const R=S.round,w=R.w,n=R.stars; return `${hud()}<div class="result" style="--wc:${w.color}">${mascot(n===3?'wow':'happy',130)}<h2>${n===3?'Mükemmel!':n===2?'Çok iyi!':'Güzel iş!'}</h2>
+ <div class="bigstars" aria-label="${n} yıldız">${[1,2,3].map(i=>`<span class="${i<=n?'':'off'}" style="animation-delay:${i*.25}s">⭐</span>`).join('')}</div>
+ <p><b>${R.first}</b> / ${R.plan} soruyu ilk denemede bildin.</p><div class="stat"><span class="pill">✨ +${R.xp} XP</span><span class="pill">${w.emoji} ${w.name}</span></div>
+ <p style="max-width:430px">${n===3?'Bu dünyanın ustası oldun!':n===2?'Çok az kaldı, bir daha oynayıp 3 yıldızı alabilirsin.':'Dersi tekrar okuyup yeniden oynarsan yıldızların artar.'}${R.unlock?`<br><b>🎉 Yeni dünya açıldı: ${R.unlock}</b>`:''}</p>
+ <div class="actions"><button class="btn ghost" data-act="map">🗺️ Harita</button><button class="btn alt" data-act="again">↻ Tekrar</button>${R.nextI?`<button class="btn good" data-act="play" data-w="${R.nextI}">Sonraki Dünya ▶</button>`:''}</div></div>`; };
+function render(){ app.innerHTML=VIEWS[S.view](); const L=S.lesson; if(S.view==='lesson'){const st=LESSONS[L.w.lesson][L.i]; if(st.init)st.init($('#demo'));} if(S.view==='quiz'){setActs();} }
+function go(v){ S.view=v; render(); window.scrollTo(0,0); }
+
+/* ---- soru arayüzü ---- */
+function answerHTML(q){
+ if(q.type==='choice'){ return `<div class="opts ${q.layout||(q.options.length===2?'two':'')}">`+q.options.map((o,i)=>`<button class="opt${o==='TEK'?' o-tek':o==='ÇİFT'?' o-cift':''}${q.emo?' emo':''}" data-act="choose" data-i="${i}">${o}</button>`).join('')+'</div>'; }
+ if(q.type==='input')return `<div class="inwrap"><input id="in" type="number" inputmode="numeric" min="0" aria-label="Cevabın" placeholder="?"></div>`;
+ if(q.type==='sort'){ q.st={}; return `<div class="chips">${q.items.map((it,i)=>`<button class="chip" data-act="chip" data-i="${i}">${it.label}<small>&nbsp;</small></button>`).join('')}</div>`; }
+ if(q.type==='pick'){ q.st={}; return `<div class="chips">${q.items.map((it,i)=>`<button class="chip ${it.cls||''}" data-act="chip" data-i="${i}" aria-pressed="false">${it.label}</button>`).join('')}</div>`; }
+ if(q.type==='chart'){ q.st={tek:0,cift:0}; return `<div class="cb">${houseHTML(q.items)}<div id="cbchart" style="width:100%;display:flex;justify-content:center">${cbChart(q)}</div>
+  <div class="steps"><div class="stp od"><span class="tag od">TEK</span><button class="btn sm" data-act="cb" data-k="tek" data-d="-1" aria-label="Tek azalt">−</button><b id="cb-tek">0</b><button class="btn sm" data-act="cb" data-k="tek" data-d="1" aria-label="Tek artır">+</button></div>
+  <div class="stp ev"><span class="tag ev">ÇİFT</span><button class="btn sm" data-act="cb" data-k="cift" data-d="-1" aria-label="Çift azalt">−</button><b id="cb-cift">0</b><button class="btn sm" data-act="cb" data-k="cift" data-d="1" aria-label="Çift artır">+</button></div></div></div>`; }
+ if(q.type==='build'){ q.st={rows:[]}; return `<div class="cb">${boardHTML(q.max,{id:'bboard',start:q.start,flagStart:true,target:q.T})}<div class="cap">Komut blokları (dokununca eklenir):</div><div class="pal">${q.pal.map(n=>`<button class="btn" data-act="padd" data-n="${n}">➕ ${n}</button>`).join('')}</div>
+  <div class="rows" id="brows">${rowsHTML(q)}</div></div>`; }
+ return ''; }
+function cbChart(q){ const n=q.items.length; return barChart([{label:'TEK',v:q.st.tek,cls:'od'},{label:'ÇİFT',v:q.st.cift,cls:'ev'}],{ymax:Math.ceil(n/2)*2>12?Math.ceil(n*.75/2)*2:Math.ceil(n/2)*2,unit:n>9?10:12}); }
+function rowsHTML(q){ const r=q.st.rows; if(!r.length)return `<div class="empty">Henüz blok yok. Yukarıdan bir blok seç! (En fazla ${q.maxRows} satır)</div>`;
+ return r.map((x,i)=>`<div class="brow"><div class="blk rep">🔁 ${x.times} kez: ${x.n} ileri zıpla</div><button class="btn sm" data-act="ptimes" data-i="${i}" data-d="-1" aria-label="Azalt">−</button><span class="n">${x.times}</span><button class="btn sm" data-act="ptimes" data-i="${i}" data-d="1" aria-label="Artır">+</button><button class="btn sm ghost" data-act="pdel" data-i="${i}" aria-label="Sil">🗑</button></div>`).join(''); }
+function setActs(){ const R=S.round,el=$('#acts'); if(!el)return;
+ if(R.done)el.innerHTML=`<button class="btn good" data-act="next">${R.i+1>=R.queue.length?'Bitir 🏁':'Devam ▶'}</button>`;
+ else{ const needCheck=R.q.type!=='choice'; el.innerHTML=`<button class="btn ghost" data-act="hint">💡 İpucu</button>${needCheck?`<button class="btn" data-act="check">✔ Kontrol Et</button>`:''}${R.q.type==='build'?'<button class="btn ghost" data-act="pclear">↺ Temizle</button>':''}`; } }
+function showFB(kind,title,body,vis){ const el=$('#fb'); if(!el)return; const mood=kind==='good'?'wow':kind==='bad'?'sad':'think';
+ el.innerHTML=`<div class="fbin ${kind}">${mascot(mood,60)}<div><b class="t">${title}</b><div>${body||''}</div>${vis?`<div class="vis">${vis}</div>`:''}</div></div>`; el.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+function toast(m){ const t=document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),1800); }
+function confetti(n){ const cs=['#ff5fa2','#ffcf33','#2f6fe8','#12935a','#7048f0','#ff8a1f']; for(let i=0;i<(n||40);i++){const d=document.createElement('i');d.className='conf';d.style.left=rnd(0,100)+'vw';d.style.background=pick(cs);d.style.animationDelay=(Math.random()*.8)+'s';d.style.animationDuration=(2+Math.random()*1.6)+'s';document.body.appendChild(d);setTimeout(()=>d.remove(),4500)} }
+
+/* ---- tur akışı ---- */
+function startRound(i){ const w=WORLDS[i]; S.world=i; S.round={w,wi:i,queue:w.plan.map(p=>({g:p[0],t:p[1]})),plan:w.plan.length,i:0,first:0,xp:0,streak:0,extra:0,keys:new Set()}; genQ(); go('quiz'); }
+function genQ(){ const R=S.round,e=R.queue[R.i]; let q,n=0; do{q=G[e.g](e.t);n++}while(R.keys.has(q.key)&&n<20); R.keys.add(q.key); q.skill=q.skill||SK[e.g]; R.q=q; R.entry=e; R.attempt=0; R.done=false; R.busy=false; }
+function resolve(ok,custom){ const R=S.round,q=R.q,first=R.attempt===0,en=R.entry;
+ if(ok){ R.done=true; if(first){R.first++;R.streak++;SAVE.xp+=10;R.xp+=10;stat(q.skill,1)}else{R.streak=0;SAVE.xp+=5;R.xp+=5;stat(q.skill,0)}
+  Snd.sfx('ok'); showFB('good',pick(PRAISE)+(first?'':' Denedin ve buldun!'),q.explain); }
+ else if(first){ R.attempt=1; R.streak=0; Snd.sfx('bad'); showFB('hint','Neredeyse! Bir daha dene.',(custom?custom+'<br>':'')+'💡 '+q.hint,q.hintVisual); $('#ans').classList.add('shake'); setTimeout(()=>$('#ans')&&$('#ans').classList.remove('shake'),400); }
+ else { R.done=true; R.streak=0; stat(q.skill,0); Snd.sfx('bad'); reveal(q); showFB('bad','Doğru cevap bu:',(q.type==='choice'||q.type==='input'?`<b>${q.answer}</b>. `:'')+q.explain); }
+ if(R.done&&!(ok&&first)&&R.extra<3&&!en.extra){ R.queue.push({g:en.g,t:en.t,extra:true}); R.extra++; }
+ const s=$('#strk'); if(s)s.textContent=R.streak>1?'🔥 '+R.streak:''; if(R.done)save(); setActs(); }
+function reveal(q){ if(q.type==='choice'){$$('.opt').forEach((b,i)=>{if(q.options[i]===q.answer)b.classList.add('right')})}
+ else if(q.type==='input'){const i=$('#in');if(i)i.value=q.answer}
+ else if(q.type==='sort'){$$('.chip').forEach((b,i)=>{const t=q.items[i].truth;b.className='chip rev s-'+(t==='tek'?'tek':'cift');b.querySelector('small').textContent=t==='tek'?'TEK':'ÇİFT'})}
+ else if(q.type==='pick'){$$('.chip').forEach((b,i)=>{b.classList.remove('sel','bad');if(q.items[i].truth)b.classList.add('rev')})}
+ else if(q.type==='chart'){q.st.tek=q.truth.tek;q.st.cift=q.truth.cift;$('#cbchart').innerHTML=cbChart(q);$('#cb-tek').textContent=q.st.tek;$('#cb-cift').textContent=q.st.cift} }
+function checkAnswer(){ const R=S.round,q=R.q; if(R.done||R.busy)return;
+ if(q.type==='input'){ const v=$('#in').value.trim(); if(v===''){toast('Önce bir sayı yaz!');return} resolve(parseInt(v,10)===q.answer); }
+ else if(q.type==='sort'){ if(q.items.some(it=>!q.st[it.id])){toast('Bütün sayılara dokun!');return}
+  let bad=0; $$('.chip').forEach((b,i)=>{const it=q.items[i],okk=q.st[it.id]===it.truth; if(!okk){bad++;b.classList.add('bad')}}); resolve(bad===0,bad?`${bad} sayı yanlış sepette. Kırmızı çerçeveli sayılara tekrar bak.`:''); }
+ else if(q.type==='pick'){ let bad=0; $$('.chip').forEach((b,i)=>{const it=q.items[i],sel=!!q.st[it.id]; if(sel!==it.truth){bad++;b.classList.add('bad')}}); if(!Object.keys(q.st).some(k=>q.st[k])){toast('Önce seçim yap!');return} resolve(bad===0,bad?'Bazı seçimler yanlış ya da eksik. Kırmızı çerçeveli olanlara tekrar bak.':''); }
+ else if(q.type==='chart'){ const ok=q.st.tek===q.truth.tek&&q.st.cift===q.truth.cift; resolve(ok,ok?'':`Tek: ${q.st.tek===q.truth.tek?'doğru ✔':'yanlış ✘'}, Çift: ${q.st.cift===q.truth.cift?'doğru ✔':'yanlış ✘'}.`); }
+ else if(q.type==='build')runBuild(); }
+function runBuild(){ const R=S.round,q=R.q,rows=q.st.rows; if(!rows.length){toast('Önce blok ekle!');return}
+ const path=[q.start]; rows.forEach(r=>{for(let i=0;i<r.times;i++)path.push(path[path.length-1]+r.n)});
+ let cut=path.length,reason=''; if(q.evenOnly){const bi=path.findIndex(x=>!even(x)); if(bi>=0){cut=bi+1;reason=`Robot <b>${path[bi]}</b> (tek) sayısına bastı! Sadece çift sayılara basabilir.`}}
+ const fin=path[cut-1]; if(!reason&&fin!==q.T)reason=fin>q.T?`Robot ${fin} sayısına gitti, hedef ${q.T}. Çok ileri gitti!`:`Robot ${fin} sayısında durdu, hedef ${q.T}. Biraz daha ileri gitmeli.`;
+ R.busy=true; animate($('#bboard'),path.slice(0,cut),(st)=>{ R.busy=false; if(st==='out'){resolve(false,'Robot haritadan çıktı! Çok ileri zıpladı.');return} resolve(!reason,reason); }); }
+function nextQ(){ const R=S.round; R.i++; if(R.i>=R.queue.length){finishRound();return} genQ(); render(); window.scrollTo(0,0); }
+function finishRound(){ const R=S.round,w=R.w,ratio=R.first/R.plan,stars=ratio>=.9?3:ratio>=.65?2:1,old=wStars(w.id);
+ const nextI=R.wi<WORLDS.length-1?R.wi+1:null; const wasLocked=nextI!==null&&!unlocked(nextI);
+ SAVE.worlds[w.id]={stars:Math.max(old,stars)}; const bonus=stars*20; SAVE.xp+=bonus; R.xp+=bonus; R.stars=stars; R.unlock=(nextI!==null&&wasLocked&&unlocked(nextI))?WORLDS[nextI].name:'';
+ R.nextI=nextI!==null&&unlocked(nextI)?nextI:null; save(); go('result'); Snd.sfx('win'); setTimeout(()=>Snd.sfx('star'),700); confetti(stars===3?70:35); }
+
+/* ---- etkinlikler ---- */
+function act(a,el){ const R=S.round;
+ switch(a){
+  case 'start': Snd.init(); Snd.resume(); if(SAVE.music)Snd.start(); Snd.sfx('ok'); go('map'); break;
+  case 'map': case 'quit': Snd.sfx('click'); go('map'); break;
+  case 'music': SAVE.music=!SAVE.music; save(); Snd.init(); Snd.resume(); if(SAVE.music){Snd.start();} Snd.setMusic(SAVE.music); render(); break;
+  case 'sfx': SAVE.sfx=!SAVE.sfx; save(); render(); Snd.sfx('click'); break;
+  case 'reset': if(el.dataset.sure){SAVE.xp=0;SAVE.worlds={};SAVE.stats={};SAVE.seen={};save();render()}else{el.dataset.sure='1';el.textContent='Emin misin? Tekrar dokun.'} break;
+  case 'lesson': { const w=WORLDS[+el.dataset.w]; S.lesson={w,i:0,wi:+el.dataset.w}; Snd.sfx('click'); go('lesson'); break; }
+  case 'lnext': { const L=S.lesson,n=LESSONS[L.w.lesson].length; Snd.sfx('click'); if(L.i<n-1){L.i++;render()}else{SAVE.seen[L.w.id]=1;save();startRound(L.wi)} break; }
+  case 'lprev': S.lesson.i=Math.max(0,S.lesson.i-1); Snd.sfx('click'); render(); break;
+  case 'play': { const i=+el.dataset.w,w=WORLDS[i]; Snd.sfx('click'); if(w.lesson&&!SAVE.seen[w.id]){S.lesson={w,i:0,wi:i};go('lesson')}else startRound(i); break; }
+  case 'again': startRound(R.wi); break;
+  case 'next': Snd.sfx('click'); nextQ(); break;
+  case 'hint': { if(R.done)break; Snd.sfx('click'); showFB('hint','İpucu',R.q.hint,R.q.hintVisual); break; }
+  case 'check': checkAnswer(); break;
+  case 'choose': { if(R.done||R.busy)break; const q=R.q,i=+el.dataset.i,ok=q.options[i]===q.answer; if(ok)el.classList.add('right'); else{el.classList.add('wrong');el.disabled=true;} resolve(ok); break; }
+  case 'chip': { if(R.done)break; const q=R.q,i=+el.dataset.i,it=q.items[i]; Snd.sfx('click'); el.classList.remove('bad');
+   if(q.type==='sort'){ const cur=q.st[it.id]; const nx=!cur?'tek':cur==='tek'?'cift':null; if(nx)q.st[it.id]=nx; else delete q.st[it.id]; el.className='chip'+(nx?' s-'+nx:''); el.querySelector('small').textContent=nx==='tek'?'TEK':nx==='cift'?'ÇİFT':' '; }
+   else{ q.st[it.id]=!q.st[it.id]; el.classList.toggle('sel',q.st[it.id]); el.setAttribute('aria-pressed',q.st[it.id]); } break; }
+  case 'mark': el.classList.toggle('mk'); Snd.sfx('click'); break;
+  case 'cb': { if(R.done)break; const q=R.q,k=el.dataset.k; q.st[k]=Math.max(0,Math.min(q.items.length,q.st[k]+ +el.dataset.d)); $('#cb-'+k).textContent=q.st[k]; $('#cbchart').innerHTML=cbChart(q); Snd.sfx('click'); break; }
+  case 'padd': { if(R.done||R.busy)break; const q=R.q,n=+el.dataset.n,r=q.st.rows.find(x=>x.n===n); Snd.sfx('click');
+   if(r)r.times=Math.min(15,r.times+1); else if(q.st.rows.length>=q.maxRows){toast(`En fazla ${q.maxRows} satır kullanabilirsin!`);break}else q.st.rows.push({n,times:1}); $('#brows').innerHTML=rowsHTML(q); break; }
+  case 'ptimes': { if(R.done||R.busy)break; const q=R.q,r=q.st.rows[+el.dataset.i]; r.times=Math.max(1,Math.min(15,r.times+ +el.dataset.d)); Snd.sfx('click'); $('#brows').innerHTML=rowsHTML(q); break; }
+  case 'pdel': { if(R.done||R.busy)break; const q=R.q; q.st.rows.splice(+el.dataset.i,1); Snd.sfx('click'); $('#brows').innerHTML=rowsHTML(q); break; }
+  case 'pclear': { if(R.done||R.busy)break; R.q.st.rows=[]; $('#brows').innerHTML=rowsHTML(R.q); $$('#bboard .cell').forEach(c=>c.classList.remove('here','seen')); break; }
+  case 'runviz': { if(R.busy)break; R.busy=true; animate($('#vizboard'),R.q.trace,()=>{R.busy=false}); break; }
+ } }
+app.addEventListener('click',e=>{ const t=e.target.closest('[data-act]'); if(!t||t.disabled)return; Snd.init(); Snd.resume(); act(t.dataset.act,t); });
+app.addEventListener('keydown',e=>{ if(e.key==='Enter'&&e.target.id==='in'){e.preventDefault();checkAnswer()} });
+
+render();
+})();
+</script>
+
+</body></html>
